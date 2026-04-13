@@ -1,0 +1,41 @@
+/* ── CTA ── */
+.cta-section {
+  background: var(--dusk); 
+  text-align: center;
+  position: relative; 
+  overflow: hidden;
+}
+
+.cta-section::before {
+  content: '';
+  position: absolute; 
+  top: -120px; 
+  left: 50%; 
+  transform: translateX(-50%);
+  width: 650px; 
+  height: 650px; 
+  border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(225,29,72,0.14) 0%, transparent 70%);
+}
+
+.cta-section .section-title { 
+  position: relative; 
+  z-index: 1; 
+  max-width: 600px; 
+  margin: 0 auto 16px; 
+}
+
+.cta-section .section-sub { 
+  position: relative; 
+  z-index: 1; 
+  margin: 0 auto 36px; 
+}
+
+.cta-buttons { 
+  display: flex; 
+  gap: 14px; 
+  justify-content: center; 
+  flex-wrap: wrap; 
+  position: relative; 
+  z-index: 1; 
+}

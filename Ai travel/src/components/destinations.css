@@ -1,0 +1,76 @@
+/* ── DESTINATIONS ── */
+.destinations-section { 
+  background: var(--dusk); 
+}
+
+.dest-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 20px; 
+  margin-top: 48px;
+}
+
+.dest-card {
+  border-radius: 20px; 
+  overflow: hidden;
+  position: relative; 
+  cursor: pointer;
+  height: 220px;
+  transition: transform 0.3s, box-shadow 0.3s;
+  background: var(--card);
+  border: 1px solid rgba(225,29,72,0.1);
+}
+
+.dest-card:hover { 
+  transform: scale(1.03); 
+  box-shadow: 0 16px 40px rgba(225,29,72,0.25); 
+}
+
+.dest-card .dest-bg {
+  position: absolute; 
+  inset: 0;
+  display: flex; 
+  align-items: center; 
+  justify-content: center;
+  font-size: 4rem;
+  background: linear-gradient(135deg, rgba(225,29,72,0.1), rgba(159,18,57,0.08));
+}
+
+.dest-card .dest-info {
+  position: absolute; 
+  bottom: 0; 
+  left: 0; 
+  right: 0;
+  padding: 20px;
+  background: linear-gradient(transparent, rgba(15,10,11,0.92));
+}
+
+.dest-card h4 { 
+  font-size: 1.05rem; 
+  font-weight: 700; 
+}
+
+.dest-card p { 
+  font-size: 0.8rem; 
+  color: rgba(255,255,255,0.5); 
+  margin-top: 4px; 
+}
+
+.dest-tag {
+  display: inline-block; 
+  background: rgba(225,29,72,0.2);
+  border: 1px solid rgba(225,29,72,0.35); 
+  color: var(--pink);
+  font-size: 0.68rem; 
+  padding: 3px 9px; 
+  border-radius: 50px; 
+  margin-top: 8px; 
+  font-weight: 600;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .dest-grid { 
+    grid-template-columns: 1fr 1fr; 
+  }
+}
