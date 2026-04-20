@@ -41,7 +41,7 @@ export const optionalAuth = async (req, res, next) => {
 };
 
 export const generateToken = (userId) => {
-  return jwt.sign({ userId }, process.env.JWT_SECRET, { expiresIn: '15m' });
+  return jwt.sign({ userId }, process.env.JWT_SECRET, { expiresIn: '7d' });
 };
 
 export const generateRefreshToken = (userId) => {

@@ -151,3 +151,23 @@
   transition: all 0.2s;
 }
 .retake-btn:hover { border-color: #666; color: #ccc; }
+
+@media (max-width: 768px) {
+  .mood-modal { padding: 28px 20px; border-radius: 16px; }
+  .mood-question h3 { font-size: 17px; }
+  .mood-options { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .mood-option { padding: 12px 8px; font-size: 13px; }
+  .opt-emoji { font-size: 24px; }
+  .result-card { flex-direction: column; align-items: flex-start; }
+  .result-right { flex-direction: row; align-items: center; width: 100%; justify-content: space-between; }
+}
+
+@media (max-width: 480px) {
+  .mood-modal { padding: 24px 16px; margin: 0 8px; }
+  .mood-options { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .mood-option { padding: 10px 6px; font-size: 12px; }
+  .opt-emoji { font-size: 20px; }
+  .results-title { font-size: 17px; }
+  .result-card h4 { font-size: 14px; }
+  .pick-btn { padding: 6px 12px; font-size: 12px; }
+}

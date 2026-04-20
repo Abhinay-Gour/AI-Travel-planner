@@ -39,3 +39,29 @@
   position: relative; 
   z-index: 1; 
 }
+
+@media (max-width: 768px) {
+  .cta-section .section-title { font-size: 1.6rem; padding: 0 16px; }
+  .cta-section .section-sub { font-size: 0.9rem; padding: 0 16px; }
+  .cta-buttons { flex-direction: column; align-items: center; padding: 0 20px; }
+  .cta-buttons a, .cta-buttons button { width: 100%; max-width: 320px; }
+}
+
+@media (max-width: 480px) {
+  .cta-section { padding: 48px 16px; }
+  .cta-section .section-title { font-size: 1.3rem; }
+}
+
+.cta-trust {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 20px;
+  position: relative;
+  z-index: 1;
+}
+.cta-trust span {
+  color: rgba(255,255,255,0.5);
+  font-size: 0.82rem;
+}

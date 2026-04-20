@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useUser } from "../context/UserContext";
 import { useAuthModal } from "../context/AuthModalContext";
+import { useToast } from "../context/ToastContext";
 import TripPlannerForm from "./TripPlannerForm";
 import TripResult from "./TripResult";
 import MoodQuiz from "./MoodQuiz";
@@ -9,11 +10,23 @@ import "./hero.css";
 const Hero = () => {
   const { isAuthenticated, user } = useUser();
   const { openAuth } = useAuthModal();
+  const toast = useToast();
   const [showForm, setShowForm] = useState(false);
   const [tripData, setTripData] = useState(null);
   const [destination, setDestination] = useState('');
   const [showAuthWarning, setShowAuthWarning] = useState(false);
   const [pendingPlanTrip, setPendingPlanTrip] = useState(false);
+
+  // Listen for destination selection from GlobeDashboard
+  useEffect(() => {
+    const handler = (e) => {
+      setDestination(e.detail);
+      if (isAuthenticated) setShowForm(true);
+      else { setPendingPlanTrip(true); openAuth('login'); }
+    };
+    window.addEventListener('selectDestination', handler);
+    return () => window.removeEventListener('selectDestination', handler);
+  }, [isAuthenticated]);
 
   // Auto-show form after login if user clicked "Login to Plan"
   useEffect(() => {
@@ -29,17 +42,16 @@ const Hero = () => {
     if (!isAuthenticated) {
       if (destination.trim()) {
         setPendingPlanTrip(true);
-        openAuth('login'); // Open login modal
+        openAuth('login');
       } else {
-        alert('Please enter a destination first');
+        toast('Please enter a destination first', 'warning');
       }
       return;
     }
-    
     if (destination.trim()) {
       setShowForm(true);
     } else {
-      alert('Please enter a destination');
+      toast('Please enter a destination', 'warning');
     }
   };
 

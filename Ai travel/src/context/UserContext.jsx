@@ -21,22 +21,12 @@ export const UserProvider = ({ children }) => {
       const savedUser = localStorage.getItem('aiTravelUser');
 
       if (token && savedUser) {
-        try {
-          // Verify token is still valid
-          const freshUser = await getProfile();
-          setUser(freshUser);
-          setIsAuthenticated(true);
-          localStorage.setItem('aiTravelUser', JSON.stringify(freshUser));
-        } catch {
-          // Token expired or invalid
-          logoutUser();
-          setUser(null);
-          setIsAuthenticated(false);
-        }
+        // Use cached user immediately — no API call on startup
+        setUser(JSON.parse(savedUser));
+        setIsAuthenticated(true);
       }
       setAuthLoading(false);
     };
-
     initAuth();
   }, []);
 

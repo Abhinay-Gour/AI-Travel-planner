@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useUser } from '../context/UserContext';
+import { useToast } from '../context/ToastContext';
 import { initiatePayment } from '../services/paymentService';
 import './pricing.css';
 
@@ -32,12 +33,13 @@ const plans = [
 
 const Pricing = () => {
   const { user, isAuthenticated } = useUser();
+  const toast = useToast();
   const [loading, setLoading] = useState(null);
   const [message, setMessage] = useState('');
 
   const handlePayment = async (planId) => {
     if (!isAuthenticated) {
-      setMessage('Please login first to purchase a plan.');
+      toast('Please login first to purchase a plan.', 'warning');
       return;
     }
 

@@ -163,3 +163,19 @@
   font-size: 13px;
   margin-top: 16px;
 }
+
+@media (max-width: 768px) {
+  .pricing-section { padding: 48px 16px; }
+  .pricing-cards { gap: 16px; flex-direction: column; align-items: center; }
+  .pricing-card { width: 100%; max-width: 340px; padding: 28px 20px; }
+  .amount { font-size: 40px; }
+}
+
+@media (max-width: 480px) {
+  .pricing-section { padding: 40px 12px; }
+  .pricing-card { max-width: 100%; padding: 24px 16px; }
+  .pricing-card h3 { font-size: 18px; }
+  .amount { font-size: 36px; }
+  .features-list li { font-size: 13px; }
+  .plan-btn { font-size: 14px; padding: 10px; }
+}

@@ -6,75 +6,29 @@ import Trip from '../models/Trip.js';
 
 const router = express.Router();
 
-// Send trip details via email
+// Send trip details via email — accepts direct tripData (no DB lookup needed)
 router.post('/send-trip', authenticateToken, [
-  body('tripId').isMongoId().withMessage('Valid trip ID required'),
-  body('email').optional().isEmail().withMessage('Valid email required')
+  body('email').isEmail().withMessage('Valid email required'),
+  body('name').trim().notEmpty().withMessage('Name required'),
+  body('tripData').notEmpty().withMessage('Trip data required')
 ], async (req, res) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(400).json({
-        success: false,
-        message: 'Validation failed',
-        errors: errors.array()
-      });
+      return res.status(400).json({ success: false, message: 'Validation failed', errors: errors.array() });
     }
 
-    const { tripId, email } = req.body;
-    const user = req.user;
-
-    // Get trip data
-    const trip = await Trip.findById(tripId);
-    if (!trip) {
-      return res.status(404).json({
-        success: false,
-        message: 'Trip not found'
-      });
-    }
-
-    // Check if user owns the trip
-    if (trip.user.toString() !== user._id.toString()) {
-      return res.status(403).json({
-        success: false,
-        message: 'Not authorized to send this trip'
-      });
-    }
-
-    // Use provided email or user's email
-    const targetEmail = email || user.email;
-
-    // Send email
-    const result = await sendTripEmail(targetEmail, user.name, trip);
+    const { email, name, tripData } = req.body;
+    const result = await sendTripEmail(email, name, tripData);
 
     if (result.success) {
-      // Update trip email sent status
-      trip.emailSent = true;
-      await trip.save();
-
-      res.json({
-        success: true,
-        message: 'Trip details sent successfully',
-        data: {
-          email: targetEmail,
-          messageId: result.messageId
-        }
-      });
+      res.json({ success: true, message: 'Trip email sent successfully', data: { email, messageId: result.messageId } });
     } else {
-      res.status(500).json({
-        success: false,
-        message: 'Failed to send email',
-        error: result.error
-      });
+      res.status(500).json({ success: false, message: 'Failed to send email', error: result.error });
     }
-
   } catch (error) {
     console.error('Send trip email error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Email service error',
-      error: error.message
-    });
+    res.status(500).json({ success: false, message: 'Email service error', error: error.message });
   }
 });
 

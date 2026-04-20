@@ -85,8 +85,8 @@ const getDestinations = (answers) => {
   }));
 };
 
-const MoodQuiz = ({ onSelectDestination }) => {
-  const [isOpen, setIsOpen] = useState(false);
+const MoodQuiz = ({ onSelectDestination, autoOpen = false }) => {
+  const [isOpen, setIsOpen] = useState(autoOpen);
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState({});
   const [results, setResults] = useState(null);

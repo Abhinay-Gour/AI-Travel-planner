@@ -30,6 +30,7 @@
     "twilio": "^4.19.0"
   },
   "devDependencies": {
+    "concurrently": "^9.2.1",
     "nodemon": "^3.0.2"
   },
   "keywords": [

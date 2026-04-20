@@ -1,0 +1,15 @@
+{
+  "name": "AI Travel Planner",
+  "short_name": "TravelAI",
+  "description": "Plan your perfect trip with AI — itineraries, hotels, flights & more",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f0a0b",
+  "theme_color": "#f43f5e",
+  "orientation": "portrait-primary",
+  "icons": [
+    { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ],
+  "categories": ["travel", "lifestyle"],
+  "screenshots": []
+}

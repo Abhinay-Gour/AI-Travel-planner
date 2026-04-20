@@ -1,8 +1,11 @@
-import React, { useState } from "react";
-import { useUser } from "../context/UserContext";
-import { useAuthModal } from "../context/AuthModalContext";
-import TripHistory from "./TripHistory";
-import "./navbar.css";
+import React, { useState } from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import { useUser } from '../context/UserContext';
+import { useAuthModal } from '../context/AuthModalContext';
+import { useTheme } from '../context/ThemeContext';
+import TripHistory from './TripHistory';
+import GlobalSearch from './GlobalSearch';
+import './navbar.css';
 
 const Navbar = () => {
   const { isAuthenticated, user, login, signup, logout } = useUser();
@@ -12,6 +15,8 @@ const Navbar = () => {
   const [authError, setAuthError] = useState('');
   const [authLoading, setAuthLoading] = useState(false);
   const [showTrips, setShowTrips] = useState(false);
+  const { isDark, toggle: toggleTheme } = useTheme();
+  const location = useLocation();
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
   const closeMenu = () => setIsMenuOpen(false);
@@ -32,7 +37,6 @@ const Navbar = () => {
     e.preventDefault();
     setAuthError('');
     setAuthLoading(true);
-
     try {
       if (authMode === 'login') {
         await login(formData.email, formData.password);
@@ -40,13 +44,21 @@ const Navbar = () => {
       } else {
         if (formData.password !== formData.confirmPassword) {
           setAuthError('Passwords do not match!');
+          setAuthLoading(false);
           return;
         }
-        await signup(formData.name, formData.email, formData.phone, formData.password);
+        if (formData.password.length < 6) {
+          setAuthError('Password must be at least 6 characters!');
+          setAuthLoading(false);
+          return;
+        }
+        // Clean phone number - remove spaces and dashes
+        const cleanPhone = formData.phone.replace(/[\s\-\(\)]/g, '');
+        await signup(formData.name, formData.email, cleanPhone, formData.password);
         closeAuth();
       }
     } catch (err) {
-      const msg = err.response?.data?.message || err.message || 'Something went wrong';
+      const msg = err.response?.data?.message || err.response?.data?.errors?.[0]?.msg || err.message || 'Something went wrong. Check if backend is running.';
       setAuthError(msg);
     } finally {
       setAuthLoading(false);
@@ -55,22 +67,29 @@ const Navbar = () => {
 
   const handleLogout = () => { logout(); setIsMenuOpen(false); };
 
+  const isActive = (path) => location.pathname === path;
+
   return (
     <>
       <nav className="nav">
-        <a href="#" className="logo">
+        <Link to="/" className="logo">
           <span className="logo-icon">✈</span>
           AI Travel Planner
-        </a>
-        
+        </Link>
+
+        <GlobalSearch />
+
         <ul className="nav-links">
-          <li><a href="#">Home</a></li>
-          <li><a href="#features">Features</a></li>
-          <li><a href="#how">How It Works</a></li>
-          <li><a href="#faq">FAQ</a></li>
+          <li><Link to="/" className={isActive('/') ? 'nav-active' : ''}>Home</Link></li>
+          <li><Link to="/transport" className={isActive('/transport') ? 'nav-active' : ''}>✈️ Transport</Link></li>
+          <li><Link to="/hotels" className={isActive('/hotels') ? 'nav-active' : ''}>🏨 Hotels</Link></li>
+          <li><Link to="/wishlist" className={isActive('/wishlist') ? 'nav-active' : ''}>❤️ Wishlist</Link></li>
+          <li><Link to="/packing" className={isActive('/packing') ? 'nav-active' : ''}>🎒 Packing</Link></li>
+          <li><Link to="/mood-quiz" className={isActive('/mood-quiz') ? 'nav-active' : ''}>🎯 Quiz</Link></li>
+          <li><Link to="/destinations" className={isActive('/destinations') ? 'nav-active' : ''}>🌍 Explore</Link></li>
           {isAuthenticated ? (
             <>
-              <li><span className="user-greeting">Hi, {user?.name}!</span></li>
+              <li><span className="user-greeting">Hi, {user?.name?.split(' ')[0]}!</span></li>
               <li><button onClick={() => setShowTrips(true)} className="nav-btn my-trips-btn">My Trips</button></li>
               <li><button onClick={handleLogout} className="nav-btn logout-btn">Logout</button></li>
             </>
@@ -80,28 +99,26 @@ const Navbar = () => {
               <li><button onClick={() => openAuthModal('signup')} className="nav-btn signup-btn">Sign Up</button></li>
             </>
           )}
+          <li><button className="theme-toggle" onClick={toggleTheme} title="Toggle theme">{isDark ? '☀️' : '🌙'}</button></li>
         </ul>
-        
-        <button 
-          className={`hamburger ${isMenuOpen ? 'open' : ''}`} 
-          onClick={toggleMenu}
-          aria-label="Menu"
-        >
-          <span></span>
-          <span></span>
-          <span></span>
+
+        <button className={`hamburger ${isMenuOpen ? 'open' : ''}`} onClick={toggleMenu} aria-label="Menu">
+          <span></span><span></span><span></span>
         </button>
       </nav>
 
       {/* Mobile Menu */}
       <div className={`mobile-menu ${isMenuOpen ? 'open' : ''}`}>
-        <a href="#" onClick={closeMenu}>Home</a>
-        <a href="#features" onClick={closeMenu}>Features</a>
-        <a href="#how" onClick={closeMenu}>How It Works</a>
-        <a href="#faq" onClick={closeMenu}>FAQ</a>
+        <Link to="/" onClick={closeMenu}>Home</Link>
+        <Link to="/transport" onClick={closeMenu}>✈️ Transport</Link>
+        <Link to="/hotels" onClick={closeMenu}>🏨 Hotels</Link>
+        <Link to="/wishlist" onClick={closeMenu}>❤️ Wishlist</Link>
+        <Link to="/packing" onClick={closeMenu}>🎒 Packing</Link>
+        <Link to="/mood-quiz" onClick={closeMenu}>🎯 Mood Quiz</Link>
+        <Link to="/destinations" onClick={closeMenu}>🌍 Explore</Link>
         {isAuthenticated ? (
           <>
-            <span className="user-greeting mobile">Hi, {user?.name}!</span>
+            <span className="user-greeting mobile">Hi, {user?.name?.split(' ')[0]}!</span>
             <button onClick={() => { setShowTrips(true); closeMenu(); }} className="nav-btn my-trips-btn mobile">My Trips</button>
             <button onClick={handleLogout} className="nav-btn logout-btn mobile">Logout</button>
           </>
@@ -115,110 +132,98 @@ const Navbar = () => {
 
       {/* Auth Modal */}
       {showAuthModal && (
-        <div className="auth-overlay">
+        <div className="auth-overlay" onClick={(e) => e.target === e.currentTarget && closeAuth()}>
           <div className="auth-modal">
-            <div className="auth-header">
-              <h2>{authMode === 'login' ? 'Welcome Back!' : 'Create Account'}</h2>
-              <button className="close-btn" onClick={closeAuth}>×</button>
-            </div>
-            
-            <div className="auth-tabs">
-              <button 
-                className={`tab ${authMode === 'login' ? 'active' : ''}`}
-                onClick={() => setAuthMode('login')}
-              >
-                Login
-              </button>
-              <button 
-                className={`tab ${authMode === 'signup' ? 'active' : ''}`}
-                onClick={() => setAuthMode('signup')}
-              >
-                Sign Up
-              </button>
+            {/* Left Visual Panel */}
+            <div className="auth-visual">
+              <div className="auth-visual-logo">
+                <span>✈</span> AI Travel Planner
+              </div>
+              <div className="auth-visual-content">
+                <h3>
+                  {authMode === 'login' ? <>Welcome<br /><em>Back!</em></> : <>Start Your<br /><em>Journey</em></>}
+                </h3>
+                <p>
+                  {authMode === 'login'
+                    ? 'Your dream trips are waiting. Login to access your personalized travel plans.'
+                    : 'Join 50,000+ travelers who plan smarter with AI. Free to start!'}
+                </p>
+                <div className="auth-perks">
+                  {[
+                    { icon: '🤖', text: 'AI-generated itineraries in seconds' },
+                    { icon: '📧', text: 'Auto-send to email & WhatsApp' },
+                    { icon: '💰', text: 'Real budget estimates in ₹' },
+                    { icon: '✈️', text: 'Flights, trains & buses in one place' },
+                  ].map((p, i) => (
+                    <div key={i} className="auth-perk">
+                      <div className="auth-perk-icon">{p.icon}</div>
+                      <span>{p.text}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div className="auth-visual-destinations">
+                {['Paris', 'Bali', 'Tokyo', 'Goa', 'Manali', 'Dubai'].map(d => (
+                  <span key={d} className="auth-dest-chip">{d}</span>
+                ))}
+              </div>
             </div>
 
-            <form className="auth-form" onSubmit={handleSubmit}>
-              {authMode === 'signup' && (
-                <div className="form-group">
-                  <label>Full Name</label>
-                  <input 
-                    type="text" 
-                    name="name"
-                    placeholder="Enter your full name" 
-                    value={formData.name}
-                    onChange={handleInputChange}
-                    required 
-                  />
+            {/* Right Form Panel */}
+            <div className="auth-form-panel">
+              <div className="auth-header">
+                <div className="auth-header-text">
+                  <h2>{authMode === 'login' ? 'Sign In' : 'Create Account'}</h2>
+                  <p>{authMode === 'login' ? 'Enter your credentials to continue' : 'Fill in your details to get started'}</p>
                 </div>
-              )}
-              
-              <div className="form-group">
-                <label>Email Address</label>
-                <input 
-                  type="email" 
-                  name="email"
-                  placeholder="your@email.com" 
-                  value={formData.email}
-                  onChange={handleInputChange}
-                  required 
-                />
+                <button className="close-btn" onClick={closeAuth}>✕</button>
               </div>
-              
-              {authMode === 'signup' && (
-                <div className="form-group">
-                  <label>Phone Number</label>
-                  <input 
-                    type="tel" 
-                    name="phone"
-                    placeholder="+1 234 567 8900" 
-                    value={formData.phone}
-                    onChange={handleInputChange}
-                    required 
-                  />
-                </div>
-              )}
-              
-              <div className="form-group">
-                <label>Password</label>
-                <input 
-                  type="password" 
-                  name="password"
-                  placeholder="Enter password" 
-                  value={formData.password}
-                  onChange={handleInputChange}
-                  required 
-                />
+
+              <div className="auth-tabs">
+                <button className={`tab ${authMode === 'login' ? 'active' : ''}`} onClick={() => { setAuthMode('login'); setAuthError(''); }}>Login</button>
+                <button className={`tab ${authMode === 'signup' ? 'active' : ''}`} onClick={() => { setAuthMode('signup'); setAuthError(''); }}>Sign Up</button>
               </div>
-              
-              {authMode === 'signup' && (
+
+              <form className="auth-form" onSubmit={handleSubmit}>
+                {authMode === 'signup' && (
+                  <div className="form-group">
+                    <label>👤 Full Name</label>
+                    <input type="text" name="name" placeholder="Rahul Sharma" value={formData.name} onChange={handleInputChange} required minLength={2} />
+                  </div>
+                )}
                 <div className="form-group">
-                  <label>Confirm Password</label>
-                  <input 
-                    type="password" 
-                    name="confirmPassword"
-                    placeholder="Confirm password" 
-                    value={formData.confirmPassword}
-                    onChange={handleInputChange}
-                    required 
-                  />
+                  <label>📧 Email Address</label>
+                  <input type="email" name="email" placeholder="you@example.com" value={formData.email} onChange={handleInputChange} required />
                 </div>
-              )}
-              
-              <button type="submit" className="auth-submit" disabled={authLoading}>
-                {authLoading ? 'Please wait...' : authMode === 'login' ? 'Login' : 'Create Account'}
-              </button>
-            </form>
-            
-            {authError && (
-              <div className="auth-error">{authError}</div>
-            )}
-            
-            <div className="auth-footer">
-              {authMode === 'login' ? (
-                <p>Don't have an account? <button onClick={() => setAuthMode('signup')} className="link-btn">Sign up</button></p>
-              ) : (
-                <p>Already have an account? <button onClick={() => setAuthMode('login')} className="link-btn">Login</button></p>
-              )}
+                {authMode === 'signup' && (
+                  <div className="form-group">
+                    <label>📱 Phone Number</label>
+                    <input type="tel" name="phone" placeholder="+91 98765 43210" value={formData.phone} onChange={handleInputChange} required />
+                  </div>
+                )}
+                <div className="form-group">
+                  <label>🔒 Password</label>
+                  <input type="password" name="password" placeholder="Min 6 characters" value={formData.password} onChange={handleInputChange} required minLength={6} />
+                </div>
+                {authMode === 'signup' && (
+                  <div className="form-group">
+                    <label>🔒 Confirm Password</label>
+                    <input type="password" name="confirmPassword" placeholder="Repeat password" value={formData.confirmPassword} onChange={handleInputChange} required />
+                  </div>
+                )}
+
+                {authError && <div className="auth-error">⚠️ {authError}</div>}
+
+                <button type="submit" className="auth-submit" disabled={authLoading}>
+                  {authLoading ? '⏳ Please wait...' : authMode === 'login' ? '🚀 Sign In' : '🎉 Create Account'}
+                </button>
+              </form>
+
+              <div className="auth-footer">
+                {authMode === 'login'
+                  ? <p>New here? <button onClick={() => { setAuthMode('signup'); setAuthError(''); }} className="link-btn">Create free account →</button></p>
+                  : <p>Already have an account? <button onClick={() => { setAuthMode('login'); setAuthError(''); }} className="link-btn">Sign in →</button></p>}
+              </div>
             </div>
           </div>
         </div>

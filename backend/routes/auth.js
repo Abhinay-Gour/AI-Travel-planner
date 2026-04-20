@@ -11,7 +11,7 @@ const router = express.Router();
 const validateRegistration = [
   body('name').trim().isLength({ min: 2, max: 50 }).withMessage('Name must be 2-50 characters'),
   body('email').isEmail().normalizeEmail().withMessage('Valid email required'),
-  body('phone').isMobilePhone().withMessage('Valid phone number required'),
+  body('phone').trim().isLength({ min: 7, max: 20 }).withMessage('Valid phone number required'),
   body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters')
 ];
 

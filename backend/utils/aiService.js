@@ -11,7 +11,7 @@ export const generateTripWithAI = async (tripParams) => {
     
     console.log('🤖 Generating trip with AI for:', destination);
     
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
     
     const prompt = `Create a detailed travel plan for ${destination} from ${startDate} to ${endDate} (${duration} days).
 
@@ -111,7 +111,7 @@ Return only valid JSON without any additional text or formatting.`;
     console.error('❌ AI trip generation error:', error);
     
     // Return fallback trip data
-    return createFallbackTripData(destination, duration, startDate, endDate);
+    return createFallbackTripData(tripParams.destination, tripParams.duration, tripParams.startDate, tripParams.endDate);
   }
 };
 

@@ -209,3 +209,20 @@ section {
 ::-webkit-scrollbar-thumb:hover {
   background: var(--deep);
 }
+
+/* ── LIGHT MODE ── */
+[data-theme="light"] {
+  --night:  #f8f4f5;
+  --dusk:   #f0e8ea;
+  --card:   #ffffff;
+  --white:  #1a0d10;
+  --gray:   #6b7280;
+}
+[data-theme="light"] body { background: #f8f4f5; color: #1a0d10; }
+[data-theme="light"] .nav { background: rgba(248,244,245,0.92); border-bottom-color: rgba(225,29,72,0.15); }
+[data-theme="light"] .nav-links a { color: rgba(26,13,16,0.7); }
+[data-theme="light"] .mobile-menu { background: rgba(248,244,245,0.98); }
+[data-theme="light"] .chatbot-window { background: #fff; }
+[data-theme="light"] .chat-msg.bot .msg-bubble { background: rgba(0,0,0,0.04); color: #1a0d10; }
+[data-theme="light"] .chat-input { background: rgba(0,0,0,0.04); color: #1a0d10; }
+[data-theme="light"] .chat-input::placeholder { color: rgba(0,0,0,0.35); }
