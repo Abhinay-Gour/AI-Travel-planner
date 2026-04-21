@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#f43f5e" />
+
+    <!-- SEO Meta Tags -->
+    <title>AI Travel Planner ✈️ — Plan Your Perfect Trip with AI</title>
+    <meta name="description" content="AI Travel Planner creates personalized day-by-day itineraries in seconds. Plan flights, hotels, budget & more for India and international destinations. Free to use!" />
+    <meta name="keywords" content="AI travel planner, trip planner India, travel itinerary, Goa trip, Manali trip, budget travel India, flight booking, hotel booking" />
+    <meta name="author" content="AI Travel Planner" />
+    <meta name="robots" content="index, follow" />
+
+    <!-- Open Graph (Facebook, WhatsApp) -->
+    <meta property="og:title" content="AI Travel Planner — Plan Your Perfect Trip" />
+    <meta property="og:description" content="Get AI-powered personalized travel itineraries in seconds. Flights, hotels, budget planning & more!" />
+    <meta property="og:image" content="https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=1200&h=630&fit=crop" />
+    <meta property="og:url" content="https://ai-travel-planner.vercel.app" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="AI Travel Planner" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="AI Travel Planner — Plan Your Perfect Trip" />
+    <meta name="twitter:description" content="AI-powered travel itineraries in seconds. Free to use!" />
+    <meta name="twitter:image" content="https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=1200&h=630&fit=crop" />
+
+    <!-- PWA -->
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="apple-touch-icon" href="/favicon.svg" />
+
+    <!-- Canonical -->
+    <link rel="canonical" href="https://ai-travel-planner.vercel.app" />
+
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js').catch(() => {});
+        });
+      }
+    </script>
+  </body>
+</html>

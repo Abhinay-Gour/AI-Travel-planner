@@ -1,0 +1,67 @@
+/* ── HOW IT WORKS ── */
+.steps-section { 
+  background: var(--night); 
+}
+
+.steps-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 0; 
+  margin-top: 60px;
+  position: relative;
+}
+
+.steps-grid::before {
+  content: '';
+  position: absolute; 
+  top: 36px; 
+  left: 12.5%; 
+  right: 12.5%; 
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(225,29,72,0.4), transparent);
+}
+
+.step { 
+  text-align: center; 
+  padding: 0 20px; 
+  position: relative; 
+}
+
+.step-num {
+  width: 72px; 
+  height: 72px; 
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--rose), var(--deep));
+  display: grid; 
+  place-items: center;
+  font-family: 'Playfair Display', serif;
+  font-size: 1.5rem; 
+  font-weight: 900;
+  margin: 0 auto 24px;
+  box-shadow: 0 8px 32px rgba(225,29,72,0.45);
+  position: relative; 
+  z-index: 1;
+}
+
+.step h3 { 
+  font-size: 1rem; 
+  font-weight: 700; 
+  margin-bottom: 10px; 
+}
+
+.step p { 
+  font-size: 0.85rem; 
+  color: rgba(255,255,255,0.42); 
+  line-height: 1.65; 
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .steps-grid::before { 
+    display: none; 
+  }
+  
+  .steps-grid { 
+    gap: 36px; 
+  }
+}

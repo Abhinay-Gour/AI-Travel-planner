@@ -1,0 +1,262 @@
+/* Globe Dashboard */
+.globe-section {
+  padding: 0;
+  min-height: 100vh;
+  background: var(--night);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.globe-bg {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 60% 50% at 50% 50%, rgba(225,29,72,0.12) 0%, transparent 70%),
+    var(--night);
+}
+
+.globe-header {
+  text-align: center;
+  padding: 60px 6vw 40px;
+  position: relative;
+  z-index: 2;
+}
+
+.globe-header .section-label { margin-bottom: 12px; }
+
+.globe-header h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 900;
+  color: var(--white);
+  margin-bottom: 16px;
+}
+
+.globe-header p {
+  color: rgba(255,255,255,0.6);
+  font-size: 1.05rem;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+/* SVG Globe */
+.globe-container {
+  position: relative;
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 20px 60px;
+  z-index: 2;
+}
+
+.globe-svg-wrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16/9;
+}
+
+.globe-svg {
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 0 40px rgba(225,29,72,0.2));
+}
+
+/* World map paths */
+.land {
+  fill: rgba(225,29,72,0.15);
+  stroke: rgba(225,29,72,0.3);
+  stroke-width: 0.5;
+  transition: fill 0.3s;
+}
+
+.land:hover {
+  fill: rgba(225,29,72,0.35);
+}
+
+.ocean {
+  fill: rgba(15,10,11,0.8);
+}
+
+/* City Pins */
+.city-pin {
+  cursor: pointer;
+  animation: pinPulse 2s ease-in-out infinite;
+}
+
+.city-pin:nth-child(2n) { animation-delay: 0.3s; }
+.city-pin:nth-child(3n) { animation-delay: 0.6s; }
+.city-pin:nth-child(4n) { animation-delay: 0.9s; }
+.city-pin:nth-child(5n) { animation-delay: 1.2s; }
+
+@keyframes pinPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.7; transform: scale(1.2); }
+}
+
+.pin-dot {
+  fill: var(--rose);
+  filter: drop-shadow(0 0 6px rgba(244,63,94,0.8));
+}
+
+.pin-ring {
+  fill: none;
+  stroke: var(--rose);
+  stroke-width: 1;
+  opacity: 0.5;
+  animation: ringExpand 2s ease-out infinite;
+}
+
+@keyframes ringExpand {
+  0% { r: 4; opacity: 0.8; }
+  100% { r: 12; opacity: 0; }
+}
+
+.pin-label {
+  fill: var(--white);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 9px;
+  font-weight: 600;
+  pointer-events: none;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+}
+
+/* City Tooltip */
+.city-tooltip {
+  position: absolute;
+  background: rgba(31,16,20,0.98);
+  border: 1px solid rgba(225,29,72,0.4);
+  border-radius: 16px;
+  padding: 16px 20px;
+  min-width: 220px;
+  pointer-events: none;
+  z-index: 10;
+  box-shadow: 0 16px 40px rgba(225,29,72,0.3);
+  animation: tooltipIn 0.2s ease;
+  transform: translate(-50%, -110%);
+}
+
+@keyframes tooltipIn {
+  from { opacity: 0; transform: translate(-50%, -100%); }
+  to { opacity: 1; transform: translate(-50%, -110%); }
+}
+
+.tooltip-img {
+  width: 100%;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-bottom: 10px;
+}
+
+.tooltip-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--white);
+  margin-bottom: 4px;
+}
+
+.tooltip-country {
+  font-size: 0.75rem;
+  color: var(--rose);
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.tooltip-desc {
+  font-size: 0.78rem;
+  color: rgba(255,255,255,0.65);
+  line-height: 1.4;
+  margin-bottom: 10px;
+}
+
+.tooltip-tags {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.tooltip-tag {
+  background: rgba(225,29,72,0.15);
+  border: 1px solid rgba(225,29,72,0.3);
+  color: var(--pink);
+  font-size: 0.7rem;
+  padding: 2px 8px;
+  border-radius: 20px;
+  font-weight: 600;
+}
+
+/* Floating city cards below globe */
+.city-cards-scroll {
+  width: 100%;
+  overflow-x: auto;
+  padding: 0 6vw 60px;
+  scrollbar-width: none;
+  position: relative;
+  z-index: 2;
+}
+
+.city-cards-scroll::-webkit-scrollbar { display: none; }
+
+.city-cards-track {
+  display: flex;
+  gap: 16px;
+  width: max-content;
+  animation: scrollTrack 30s linear infinite;
+}
+
+.city-cards-track:hover { animation-play-state: paused; }
+
+@keyframes scrollTrack {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.city-mini-card {
+  background: rgba(225,29,72,0.06);
+  border: 1px solid rgba(225,29,72,0.15);
+  border-radius: 16px;
+  overflow: hidden;
+  width: 180px;
+  flex-shrink: 0;
+  cursor: pointer;
+  transition: transform 0.3s, border-color 0.3s, box-shadow 0.3s;
+}
+
+.city-mini-card:hover {
+  transform: translateY(-6px);
+  border-color: rgba(244,63,94,0.5);
+  box-shadow: 0 12px 32px rgba(225,29,72,0.25);
+}
+
+.city-mini-img {
+  width: 100%;
+  height: 100px;
+  object-fit: cover;
+}
+
+.city-mini-info {
+  padding: 10px 12px;
+}
+
+.city-mini-name {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--white);
+  margin-bottom: 2px;
+}
+
+.city-mini-country {
+  font-size: 0.72rem;
+  color: var(--rose);
+  font-weight: 600;
+}
+
+@media (max-width: 768px) {
+  .globe-header { padding: 40px 4vw 24px; }
+  .globe-container { padding: 0 10px 40px; }
+}

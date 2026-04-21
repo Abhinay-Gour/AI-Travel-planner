@@ -1,0 +1,110 @@
+.calc-section {
+  padding: 80px 20px;
+  background: #0d0d0d;
+  text-align: center;
+}
+
+.calc-wrapper {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+  max-width: 1000px;
+  margin: 40px auto 0;
+  text-align: left;
+}
+
+@media (max-width: 768px) {
+  .calc-wrapper { grid-template-columns: 1fr; }
+}
+
+.calc-inputs, .calc-results {
+  background: #111;
+  border: 1px solid #222;
+  border-radius: 16px;
+  padding: 28px;
+}
+
+.calc-group { margin-bottom: 20px; }
+.calc-group label {
+  display: block;
+  color: #aaa;
+  font-size: 13px;
+  margin-bottom: 8px;
+}
+.calc-group label strong { color: #fff; }
+
+.calc-group select {
+  width: 100%;
+  background: #1a1a1a;
+  border: 1px solid #333;
+  color: #fff;
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  outline: none;
+}
+
+.calc-group input[type="range"] {
+  width: 100%;
+  accent-color: #e53e3e;
+  cursor: pointer;
+}
+
+.calc-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.style-btns { display: flex; gap: 8px; }
+.style-btn {
+  flex: 1;
+  background: #1a1a1a;
+  border: 1px solid #333;
+  color: #888;
+  padding: 8px 6px;
+  border-radius: 8px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.style-btn.active {
+  background: #2d0a0a;
+  border-color: #e53e3e;
+  color: #e53e3e;
+}
+
+.total-box {
+  background: linear-gradient(135deg, #1a0505, #2d0a0a);
+  border: 1px solid #e53e3e44;
+  border-radius: 12px;
+  padding: 24px;
+  text-align: center;
+  margin-bottom: 24px;
+}
+.total-label { color: #888; font-size: 13px; margin-bottom: 8px; }
+.total-amount { color: #e53e3e; font-size: 36px; font-weight: 800; }
+.per-person { color: #666; font-size: 12px; margin-top: 6px; }
+
+.breakdown-bars { display: flex; flex-direction: column; gap: 12px; }
+
+.bar-row {
+  display: grid;
+  grid-template-columns: 120px 1fr 80px;
+  align-items: center;
+  gap: 10px;
+}
+.bar-label { color: #aaa; font-size: 13px; }
+.bar-track {
+  background: #1a1a1a;
+  border-radius: 4px;
+  height: 8px;
+  overflow: hidden;
+}
+.bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #e53e3e, #fc8181);
+  border-radius: 4px;
+  transition: width 0.5s ease;
+}
+.bar-value { color: #fff; font-size: 12px; font-weight: 600; text-align: right; }
