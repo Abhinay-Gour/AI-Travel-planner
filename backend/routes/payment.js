@@ -6,10 +6,14 @@ import User from '../models/User.js';
 
 const router = express.Router();
 
-const razorpay = new Razorpay({
-  key_id: process.env.RAZORPAY_KEY_ID,
-  key_secret: process.env.RAZORPAY_KEY_SECRET
-});
+// Only init Razorpay if keys are available
+let razorpay = null;
+if (process.env.RAZORPAY_KEY_ID && !process.env.RAZORPAY_KEY_ID.includes('your_')) {
+  razorpay = new Razorpay({
+    key_id: process.env.RAZORPAY_KEY_ID,
+    key_secret: process.env.RAZORPAY_KEY_SECRET
+  });
+}
 
 // Plans config (amount in paise — 1 INR = 100 paise)
 const PLANS = {
@@ -21,6 +25,9 @@ const PLANS = {
 // Create Razorpay order
 router.post('/create-order', authenticateToken, async (req, res) => {
   try {
+    if (!razorpay) {
+      return res.status(503).json({ success: false, message: 'Payment service not configured' });
+    }
     const { plan } = req.body;
     const planConfig = PLANS[plan];
 
