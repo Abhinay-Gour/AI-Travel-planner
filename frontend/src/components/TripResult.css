@@ -624,11 +624,22 @@
 
 /* Responsive */
 @media (max-width: 768px) {
+  .trip-result-overlay {
+    padding: 0;
+    align-items: flex-end;
+  }
+
   .trip-result-modal {
-    padding: 24px;
-    margin: 10px;
+    padding: 20px 16px;
+    margin: 0;
+    border-radius: 20px 20px 0 0;
+    max-height: 92vh;
   }
   
+  .result-header h2 {
+    font-size: 1.3rem;
+  }
+
   .trip-meta {
     flex-direction: column;
     gap: 8px;
@@ -645,6 +656,18 @@
   .user-details {
     flex-direction: column;
     gap: 8px;
+  }
+
+  .highlights-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .destination-hero-image {
+    height: 160px;
+  }
+
+  .destination-overlay h3 {
+    font-size: 1.3rem;
   }
 }
 

@@ -583,6 +583,42 @@
   .auth-form-panel {
     padding: 28px 24px;
   }
+
+  .nav {
+    padding: 14px 4vw;
+  }
+
+  .logo {
+    font-size: 1.1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .nav {
+    padding: 12px 4vw;
+  }
+
+  .logo {
+    font-size: 1rem;
+  }
+
+  .logo-icon {
+    width: 30px;
+    height: 30px;
+    font-size: 0.9rem;
+  }
+
+  .auth-modal {
+    border-radius: 20px;
+  }
+
+  .auth-form-panel {
+    padding: 20px 16px;
+  }
+
+  .auth-header-text h2 {
+    font-size: 1.4rem;
+  }
 }
 
 .my-trips-btn {
