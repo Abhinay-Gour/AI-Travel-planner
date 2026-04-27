@@ -2,5 +2,20 @@
   "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }],
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
-  "framework": "vite"
+  "framework": "vite",
+  "env": {
+    "VITE_GEMINI_API_KEY": "AIzaSyC4TEt56qXTDixpoLBnDsr14Cjy_t9GcXY",
+    "VITE_EXCHANGERATE_BASE": "INR",
+    "VITE_API_URL": "https://ai-travel-backend-v484.onrender.com/api",
+    "VITE_BACKEND_URL": "https://ai-travel-backend-v484.onrender.com"
+  },
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "X-Frame-Options", "value": "DENY" }
+      ]
+    }
+  ]
 }
