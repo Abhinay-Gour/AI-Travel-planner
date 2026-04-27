@@ -64,6 +64,9 @@ router.post('/create-order', authenticateToken, async (req, res) => {
 // Verify payment after frontend completes it
 router.post('/verify', authenticateToken, async (req, res) => {
   try {
+    if (!razorpay) {
+      return res.status(503).json({ success: false, message: 'Payment service not configured' });
+    }
     const { razorpay_order_id, razorpay_payment_id, razorpay_signature, plan, tripData } = req.body;
 
     // Verify signature
@@ -133,6 +136,10 @@ router.post('/webhook', express.raw({ type: 'application/json' }), async (req, r
   try {
     const signature = req.headers['x-razorpay-signature'];
     const body = req.body;
+
+    if (!process.env.RAZORPAY_WEBHOOK_SECRET || process.env.RAZORPAY_WEBHOOK_SECRET.includes('your_')) {
+      return res.status(503).json({ message: 'Webhook not configured' });
+    }
 
     const expectedSignature = crypto
       .createHmac('sha256', process.env.RAZORPAY_WEBHOOK_SECRET)
