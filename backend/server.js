@@ -24,6 +24,7 @@ const allowedOrigins = [
   'http://localhost:5173',
   'http://localhost:5174',
   'http://localhost:4173',
+  'https://aitravelplanner-seven.vercel.app',
   process.env.FRONTEND_URL,
 ].filter(Boolean);
 
