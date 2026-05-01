@@ -16,20 +16,31 @@ const ScrollToTop = () => {
       onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
       aria-label="Scroll to top"
       style={{
-        position: 'fixed', bottom: 100, left: 20, zIndex: 996,
-        width: 44, height: 44, borderRadius: '50%',
-        background: 'linear-gradient(135deg,#f43f5e,#9f1239)',
-        border: 'none', color: 'white', fontSize: '1.1rem',
+        position: 'fixed', bottom: 96, left: 20, zIndex: 996,
+        width: 40, height: 40, borderRadius: '10px',
+        background: 'rgba(10,15,30,0.9)',
+        border: '1px solid rgba(99,102,241,0.3)',
+        color: '#a5b4fc', fontSize: '1rem',
         cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
-        boxShadow: '0 4px 16px rgba(244,63,94,0.4)',
-        animation: 'fadeIn 0.3s ease',
-        transition: 'transform 0.2s',
+        backdropFilter: 'blur(12px)',
+        boxShadow: '0 4px 14px rgba(0,0,0,0.3)',
+        animation: 'fadeInBtn 0.25s ease',
+        transition: 'all 0.2s',
+        fontFamily: 'Inter, sans-serif',
       }}
-      onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.1)'}
-      onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
+      onMouseEnter={e => {
+        e.currentTarget.style.background = 'rgba(99,102,241,0.15)';
+        e.currentTarget.style.borderColor = 'rgba(99,102,241,0.6)';
+        e.currentTarget.style.color = '#fff';
+      }}
+      onMouseLeave={e => {
+        e.currentTarget.style.background = 'rgba(10,15,30,0.9)';
+        e.currentTarget.style.borderColor = 'rgba(99,102,241,0.3)';
+        e.currentTarget.style.color = '#a5b4fc';
+      }}
     >
       ↑
-      <style>{`@keyframes fadeIn { from { opacity:0; transform:scale(0.5); } to { opacity:1; transform:scale(1); } }`}</style>
+      <style>{`@keyframes fadeInBtn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }`}</style>
     </button>
   );
 };
