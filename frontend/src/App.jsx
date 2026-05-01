@@ -5,6 +5,8 @@ import { AuthModalProvider } from './context/AuthModalContext';
 import { ThemeProvider } from './context/ThemeContext';
 import { ToastProvider } from './context/ToastContext';
 import ErrorBoundary from './components/ErrorBoundary';
+import { useEffect } from 'react';
+import { trackPage } from './services/analyticsService';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import GlobeDashboard from './components/GlobeDashboard';
@@ -45,6 +47,9 @@ import { PrivacyPolicy, TermsOfService } from './components/LegalPages';
 // Page transition wrapper
 const PageWrapper = ({ children }) => {
   const location = useLocation();
+  useEffect(() => {
+    trackPage(location.pathname);
+  }, [location.pathname]);
   return (
     <div key={location.pathname} style={{ animation: 'pageIn 0.3s ease' }}>
       {children}

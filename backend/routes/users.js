@@ -447,4 +447,16 @@ router.delete('/account', authenticateToken, [
   }
 });
 
+// Track user events / page views
+router.post('/track', authenticateToken, async (req, res) => {
+  try {
+    const { event, page } = req.body;
+    // Lightweight — just log it, can be extended to store in DB
+    console.log(`📊 [TRACK] user=${req.user._id} event=${event} page=${page}`);
+    res.json({ success: true });
+  } catch {
+    res.json({ success: false });
+  }
+});
+
 export default router;

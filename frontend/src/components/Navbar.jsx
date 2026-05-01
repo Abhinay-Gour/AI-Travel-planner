@@ -14,6 +14,9 @@ const Navbar = () => {
   const [formData, setFormData] = useState({ name: '', email: '', phone: '', password: '', confirmPassword: '' });
   const [authError, setAuthError] = useState('');
   const [authLoading, setAuthLoading] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState('');
+  const [forgotSent, setForgotSent] = useState(false);
+  const [forgotLoading, setForgotLoading] = useState(false);
   const [showTrips, setShowTrips] = useState(false);
   const { isDark, toggle: toggleTheme } = useTheme();
   const location = useLocation();
@@ -26,6 +29,29 @@ const Navbar = () => {
     closeAuthModal();
     setFormData({ name: '', email: '', phone: '', password: '', confirmPassword: '' });
     setAuthError('');
+    setForgotEmail('');
+    setForgotSent(false);
+  };
+
+  const handleForgotPassword = async (e) => {
+    e.preventDefault();
+    setForgotLoading(true);
+    setAuthError('');
+    try {
+      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
+      const res = await fetch(`${API_URL}/auth/forgot-password`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: forgotEmail })
+      });
+      const data = await res.json();
+      if (data.success) setForgotSent(true);
+      else setAuthError(data.message || 'Failed to send reset email');
+    } catch {
+      setAuthError('Network error. Please try again.');
+    } finally {
+      setForgotLoading(false);
+    }
   };
 
   const handleInputChange = (e) => {
@@ -184,7 +210,30 @@ const Navbar = () => {
                 <button className={`tab ${authMode === 'signup' ? 'active' : ''}`} onClick={() => { setAuthMode('signup'); setAuthError(''); }}>Sign Up</button>
               </div>
 
-              <form className="auth-form" onSubmit={handleSubmit}>
+              {authMode === 'forgot' ? (
+                <div>
+                  {forgotSent ? (
+                    <div style={{textAlign:'center',padding:'32px 0'}}>
+                      <div style={{fontSize:'3rem',marginBottom:'16px'}}>📧</div>
+                      <h3 style={{color:'var(--white)',marginBottom:'8px'}}>Check Your Email!</h3>
+                      <p style={{color:'rgba(255,255,255,0.6)',fontSize:'0.9rem'}}>We sent a password reset link to <strong style={{color:'var(--rose)'}}>{forgotEmail}</strong></p>
+                      <p style={{color:'rgba(255,255,255,0.4)',fontSize:'0.8rem',marginTop:'8px'}}>Link expires in 10 minutes</p>
+                    </div>
+                  ) : (
+                    <form onSubmit={handleForgotPassword}>
+                      <p style={{color:'rgba(255,255,255,0.6)',fontSize:'0.9rem',marginBottom:'20px'}}>Enter your email and we'll send you a reset link.</p>
+                      <div className="form-group">
+                        <label>📧 Email Address</label>
+                        <input type="email" placeholder="you@example.com" value={forgotEmail} onChange={e => setForgotEmail(e.target.value)} required />
+                      </div>
+                      {authError && <div className="auth-error">⚠️ {authError}</div>}
+                      <button type="submit" className="auth-submit" disabled={forgotLoading}>
+                        {forgotLoading ? '⏳ Sending...' : '📧 Send Reset Link'}
+                      </button>
+                    </form>
+                  )}
+                </div>
+              ) : (
                 {authMode === 'signup' && (
                   <div className="form-group">
                     <label>👤 Full Name</label>
@@ -218,11 +267,17 @@ const Navbar = () => {
                   {authLoading ? '⏳ Please wait...' : authMode === 'login' ? '🚀 Sign In' : '🎉 Create Account'}
                 </button>
               </form>
+              )}
 
               <div className="auth-footer">
                 {authMode === 'login'
-                  ? <p>New here? <button onClick={() => { setAuthMode('signup'); setAuthError(''); }} className="link-btn">Create free account →</button></p>
-                  : <p>Already have an account? <button onClick={() => { setAuthMode('login'); setAuthError(''); }} className="link-btn">Sign in →</button></p>}
+                  ? <>
+                      <p>New here? <button onClick={() => { setAuthMode('signup'); setAuthError(''); }} className="link-btn">Create free account →</button></p>
+                      <p style={{marginTop:'8px'}}><button onClick={() => { setAuthMode('forgot'); setAuthError(''); }} className="link-btn" style={{color:'rgba(255,255,255,0.4)',fontSize:'0.8rem'}}>Forgot password?</button></p>
+                    </>
+                  : authMode === 'signup'
+                  ? <p>Already have an account? <button onClick={() => { setAuthMode('login'); setAuthError(''); }} className="link-btn">Sign in →</button></p>
+                  : <p>Remember password? <button onClick={() => { setAuthMode('login'); setAuthError(''); }} className="link-btn">Sign in →</button></p>}
               </div>
             </div>
           </div>
