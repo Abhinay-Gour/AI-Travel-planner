@@ -1,34 +1,62 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 
 const LoadingScreen = ({ onDone }) => {
   const [progress, setProgress] = useState(0);
+  const [fade, setFade] = useState(false);
 
   useEffect(() => {
-    const steps = [20, 45, 70, 90, 100];
+    // Fast steps: 0→100 in ~900ms
+    const steps = [30, 60, 85, 100];
     let i = 0;
     const interval = setInterval(() => {
       if (i < steps.length) {
-        setProgress(steps[i]);
-        i++;
+        setProgress(steps[i++]);
       } else {
         clearInterval(interval);
-        setTimeout(onDone, 300);
+        setFade(true);
+        setTimeout(onDone, 250);
       }
-    }, 250);
+    }, 180);
     return () => clearInterval(interval);
   }, []);
 
   return (
-    <div style={{ position: 'fixed', inset: 0, background: 'var(--night)', zIndex: 99999, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 24 }}>
-      <div style={{ fontSize: '3.5rem', animation: 'spin 2s linear infinite' }}>✈️</div>
-      <div style={{ fontFamily: 'Playfair Display, serif', fontSize: 'clamp(1.4rem,4vw,2rem)', fontWeight: 800, color: 'var(--white)' }}>
+    <div style={{
+      position: 'fixed', inset: 0,
+      background: 'var(--night)',
+      zIndex: 99999,
+      display: 'flex', flexDirection: 'column',
+      alignItems: 'center', justifyContent: 'center', gap: 20,
+      opacity: fade ? 0 : 1,
+      transition: 'opacity 0.25s ease',
+    }}>
+      <div style={{ fontSize: '3rem', animation: 'planeFly 1s ease infinite alternate' }}>✈️</div>
+      <div style={{
+        fontFamily: 'Playfair Display, serif',
+        fontSize: 'clamp(1.3rem,4vw,1.8rem)',
+        fontWeight: 800, color: 'var(--white)',
+        letterSpacing: '-0.02em',
+      }}>
         AI Travel Planner
       </div>
-      <div style={{ width: 200, background: 'rgba(255,255,255,0.08)', borderRadius: 10, height: 6, overflow: 'hidden' }}>
-        <div style={{ height: '100%', background: 'linear-gradient(90deg,#f43f5e,#9f1239)', borderRadius: 10, width: `${progress}%`, transition: 'width 0.3s ease' }} />
+      <div style={{ width: 180, background: 'rgba(255,255,255,0.08)', borderRadius: 10, height: 4, overflow: 'hidden' }}>
+        <div style={{
+          height: '100%',
+          background: 'linear-gradient(90deg,#f43f5e,#9f1239)',
+          borderRadius: 10,
+          width: `${progress}%`,
+          transition: 'width 0.2s ease',
+        }} />
       </div>
-      <div style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.82rem' }}>Loading your travel experience...</div>
-      <style>{`@keyframes spin { from { transform: rotate(0deg) translateX(20px) rotate(0deg); } to { transform: rotate(360deg) translateX(20px) rotate(-360deg); } }`}</style>
+      <div style={{ color: 'rgba(255,255,255,0.35)', fontSize: '0.78rem', letterSpacing: '0.05em' }}>
+        {progress < 60 ? 'Initializing AI...' : progress < 100 ? 'Almost ready...' : 'Let\'s go! ✨'}
+      </div>
+      <style>{`
+        @keyframes planeFly {
+          from { transform: translateX(-8px) rotate(-5deg); }
+          to   { transform: translateX(8px) rotate(5deg); }
+        }
+      `}</style>
     </div>
   );
 };

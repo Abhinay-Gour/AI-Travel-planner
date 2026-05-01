@@ -7,6 +7,8 @@ import TripResult from "./TripResult";
 import MoodQuiz from "./MoodQuiz";
 import "./hero.css";
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
+
 const Hero = () => {
   const { isAuthenticated, user } = useUser();
   const { openAuth } = useAuthModal();
@@ -16,6 +18,14 @@ const Hero = () => {
   const [destination, setDestination] = useState('');
   const [showAuthWarning, setShowAuthWarning] = useState(false);
   const [pendingPlanTrip, setPendingPlanTrip] = useState(false);
+  const [realStats, setRealStats] = useState({ trips: null, users: null });
+
+  useEffect(() => {
+    fetch(`${API_URL}/users/stats/public`)
+      .then(r => r.json())
+      .then(d => { if (d.success) setRealStats({ trips: d.data.totalTrips, users: d.data.totalUsers }); })
+      .catch(() => {});
+  }, []);
 
   // Listen for destination selection from GlobeDashboard
   useEffect(() => {
@@ -117,8 +127,8 @@ const Hero = () => {
             {/* Quick destination cards */}
             <div className="hero-stats">
               <span>No credit card required</span>
-              <span>50,000+ trips planned</span>
-              <span>4.8/5 user rating</span>
+              <span>{realStats.trips !== null ? `${realStats.trips.toLocaleString()}+ trips planned` : '50,000+ trips planned'}</span>
+              <span>{realStats.users !== null ? `${realStats.users.toLocaleString()}+ travelers` : '4.8/5 user rating'}</span>
             </div>
             <MoodQuiz onSelectDestination={(dest) => { setDestination(dest); if (isAuthenticated) setShowForm(true); else { setPendingPlanTrip(true); openAuth('login'); } }} />
             

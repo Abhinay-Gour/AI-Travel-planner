@@ -447,6 +447,32 @@ router.delete('/account', authenticateToken, [
   }
 });
 
+// Public leaderboard — top travelers by trips
+router.get('/leaderboard', async (req, res) => {
+  try {
+    const topUsers = await User.find({ isActive: true })
+      .sort({ 'stats.tripsPlanned': -1 })
+      .limit(10)
+      .select('name stats avatar');
+    res.json({ success: true, data: topUsers });
+  } catch {
+    res.json({ success: true, data: [] });
+  }
+});
+
+// Public stats — no auth needed (for homepage)
+router.get('/stats/public', async (req, res) => {
+  try {
+    const [totalTrips, totalUsers] = await Promise.all([
+      Trip.countDocuments(),
+      User.countDocuments({ isActive: true })
+    ]);
+    res.json({ success: true, data: { totalTrips, totalUsers } });
+  } catch {
+    res.json({ success: true, data: { totalTrips: 0, totalUsers: 0 } });
+  }
+});
+
 // Track user events / page views
 router.post('/track', authenticateToken, async (req, res) => {
   try {
