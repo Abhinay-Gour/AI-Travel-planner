@@ -1,55 +1,62 @@
 .pricing-section {
-  padding: 80px 20px;
+  padding: 88px 6vw;
   text-align: center;
-  background: #0a0a0a;
+  background: var(--dusk);
 }
 
 .pricing-cards {
   display: flex;
   justify-content: center;
-  gap: 24px;
+  gap: 20px;
   flex-wrap: wrap;
-  margin: 40px auto;
-  max-width: 1100px;
+  margin: 48px auto 0;
+  max-width: 1000px;
 }
 
 .pricing-card {
-  background: #111;
-  border: 1px solid #222;
-  border-radius: 16px;
-  padding: 36px 28px;
-  width: 300px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 32px 28px;
+  width: 290px;
   position: relative;
-  transition: transform 0.2s, border-color 0.2s;
+  transition: transform 0.25s, border-color 0.25s, box-shadow 0.25s;
 }
 
 .pricing-card:hover {
   transform: translateY(-4px);
-  border-color: #444;
+  border-color: rgba(255,255,255,0.12);
+  box-shadow: 0 16px 40px rgba(0,0,0,0.3);
 }
 
 .pricing-card.popular {
-  border-color: #e53e3e;
-  background: #130a0a;
+  border-color: var(--indigo);
+  background: linear-gradient(160deg, rgba(99,102,241,0.08) 0%, var(--card) 60%);
+  box-shadow: 0 0 0 1px rgba(99,102,241,0.2), 0 16px 40px rgba(99,102,241,0.1);
 }
 
 .popular-badge {
   position: absolute;
-  top: -14px;
+  top: -13px;
   left: 50%;
   transform: translateX(-50%);
-  background: #e53e3e;
+  background: linear-gradient(135deg, var(--indigo), var(--indigo2));
   color: #fff;
-  font-size: 12px;
-  font-weight: 600;
+  font-size: 0.7rem;
+  font-weight: 700;
   padding: 4px 16px;
   border-radius: 20px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  white-space: nowrap;
 }
 
 .pricing-card h3 {
-  color: #fff;
-  font-size: 22px;
-  margin-bottom: 16px;
+  color: var(--white);
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 20px;
+  letter-spacing: -0.01em;
 }
 
 .price {
@@ -57,34 +64,23 @@
   align-items: flex-end;
   justify-content: center;
   gap: 2px;
-  margin-bottom: 8px;
-}
-
-.currency {
-  color: #e53e3e;
-  font-size: 20px;
-  font-weight: 600;
   margin-bottom: 6px;
 }
 
-.amount {
-  color: #fff;
-  font-size: 48px;
-  font-weight: 700;
-  line-height: 1;
-}
-
-.period {
-  color: #888;
-  font-size: 14px;
-  margin-bottom: 8px;
-}
+.currency { color: var(--muted); font-size: 1.1rem; font-weight: 600; margin-bottom: 8px; }
+.amount { color: var(--white); font-size: 3rem; font-weight: 900; line-height: 1; letter-spacing: -0.04em; }
+.period { color: var(--gray); font-size: 0.82rem; margin-bottom: 6px; }
 
 .trips-count {
-  color: #e53e3e;
-  font-size: 14px;
+  color: var(--indigo);
+  font-size: 0.82rem;
   font-weight: 600;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
+  background: var(--indigo3);
+  border: 1px solid var(--border2);
+  border-radius: 20px;
+  padding: 4px 14px;
+  display: inline-block;
 }
 
 .features-list {
@@ -95,87 +91,72 @@
 }
 
 .features-list li {
-  color: #ccc;
-  font-size: 14px;
-  padding: 6px 0;
-  border-bottom: 1px solid #1a1a1a;
+  color: var(--muted);
+  font-size: 0.85rem;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.features-list li::before {
+  content: '✓';
+  color: var(--indigo);
+  font-weight: 700;
+  font-size: 0.78rem;
+  flex-shrink: 0;
 }
 
 .plan-btn {
   width: 100%;
   padding: 12px;
-  border-radius: 8px;
-  font-size: 15px;
-  font-weight: 600;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  font-weight: 700;
   cursor: pointer;
   border: none;
-  transition: opacity 0.2s;
+  transition: all 0.2s;
+  font-family: 'Inter', sans-serif;
 }
-
-.plan-btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
+.plan-btn:disabled { opacity: 0.55; cursor: not-allowed; }
 
 .plan-btn-primary {
-  background: #e53e3e;
+  background: linear-gradient(135deg, var(--rose), var(--deep));
   color: #fff;
+  box-shadow: 0 4px 16px var(--glow-rose);
 }
-
-.plan-btn-primary:hover:not(:disabled) {
-  background: #c53030;
-}
+.plan-btn-primary:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 6px 22px rgba(244,63,94,0.45); }
 
 .plan-btn-secondary {
   background: transparent;
-  color: #fff;
-  border: 1px solid #444;
+  color: var(--muted);
+  border: 1px solid var(--border);
 }
-
-.plan-btn-secondary:hover:not(:disabled) {
-  border-color: #e53e3e;
-  color: #e53e3e;
-}
+.plan-btn-secondary:hover:not(:disabled) { border-color: var(--indigo); color: var(--white); background: var(--indigo3); }
 
 .pricing-message {
-  max-width: 500px;
+  max-width: 480px;
   margin: 0 auto 20px;
   padding: 12px 20px;
-  border-radius: 8px;
-  font-size: 14px;
+  border-radius: 12px;
+  font-size: 0.85rem;
   font-weight: 500;
 }
+.pricing-message.success { background: rgba(16,185,129,0.08); color: #34d399; border: 1px solid rgba(16,185,129,0.2); }
+.pricing-message.error   { background: rgba(244,63,94,0.08); color: var(--pink); border: 1px solid rgba(244,63,94,0.2); }
 
-.pricing-message.success {
-  background: #0d2e1a;
-  color: #48bb78;
-  border: 1px solid #276749;
-}
-
-.pricing-message.error {
-  background: #2d0a0a;
-  color: #fc8181;
-  border: 1px solid #742a2a;
-}
-
-.pricing-note {
-  color: #555;
-  font-size: 13px;
-  margin-top: 16px;
-}
+.pricing-note { color: var(--gray); font-size: 0.78rem; margin-top: 20px; }
 
 @media (max-width: 768px) {
-  .pricing-section { padding: 48px 16px; }
-  .pricing-cards { gap: 16px; flex-direction: column; align-items: center; }
+  .pricing-section { padding: 60px 4vw; }
+  .pricing-cards { gap: 14px; flex-direction: column; align-items: center; }
   .pricing-card { width: 100%; max-width: 340px; padding: 28px 20px; }
-  .amount { font-size: 40px; }
+  .amount { font-size: 2.5rem; }
 }
-
 @media (max-width: 480px) {
-  .pricing-section { padding: 40px 12px; }
-  .pricing-card { max-width: 100%; padding: 24px 16px; }
-  .pricing-card h3 { font-size: 18px; }
-  .amount { font-size: 36px; }
-  .features-list li { font-size: 13px; }
-  .plan-btn { font-size: 14px; padding: 10px; }
+  .pricing-card { max-width: 100%; padding: 22px 16px; }
+  .pricing-card h3 { font-size: 1rem; }
+  .amount { font-size: 2.2rem; }
+  .features-list li { font-size: 0.82rem; }
 }
