@@ -36,6 +36,7 @@ import CookieNotice from './components/CookieNotice';
 import WhatsAppSupport from './components/WhatsAppSupport';
 import NotFound from './components/NotFound';
 import { PrivacyPolicy, TermsOfService } from './components/LegalPages';
+import ResetPassword from './components/ResetPassword';
 
 // Page transition wrapper
 const PageWrapper = ({ children }) => {
@@ -166,6 +167,7 @@ function App() {
                   <Route path="/destinations" element={<DestinationsPage />} />
                   <Route path="/privacy" element={<PageWrapper><PrivacyPolicy /></PageWrapper>} />
                   <Route path="/terms" element={<PageWrapper><TermsOfService /></PageWrapper>} />
+                  <Route path="/reset-password/:token" element={<ResetPassword />} />
                   <Route path="*" element={<PageWrapper><NotFound /></PageWrapper>} />
                 </Routes>
                 <Footer />

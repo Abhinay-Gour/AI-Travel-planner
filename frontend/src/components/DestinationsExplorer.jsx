@@ -64,68 +64,72 @@ const DestinationsExplorer = () => {
       <p className="section-sub">Browse {DESTINATIONS.length}+ destinations — filter by vibe, budget & more</p>
 
       {/* Filters */}
-      <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(225,29,72,0.12)', borderRadius: 16, padding: '20px', marginBottom: 28 }}>
+      <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border)', borderRadius: 16, padding: '20px', marginBottom: 28 }}>
         <input value={search} onChange={e => setSearch(e.target.value)} placeholder="🔍 Search destination or country..."
-          style={{ width: '100%', padding: '10px 16px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(225,29,72,0.2)', borderRadius: 10, color: 'white', fontFamily: 'DM Sans', fontSize: '0.9rem', marginBottom: 16, boxSizing: 'border-box' }} />
+          style={{ width: '100%', padding: '10px 16px', background: 'rgba(255,255,255,0.04)', border: '1.5px solid var(--border)', borderRadius: 10, color: 'var(--white)', fontFamily: 'Inter, sans-serif', fontSize: '0.9rem', marginBottom: 16, boxSizing: 'border-box', outline: 'none' }}
+          onFocus={e => e.target.style.borderColor = 'var(--indigo)'}
+          onBlur={e => e.target.style.borderColor = 'var(--border)'} />
 
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 12 }}>
-          <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.78rem', alignSelf: 'center' }}>Vibe:</span>
+          <span style={{ color: 'var(--gray)', fontSize: '0.75rem', alignSelf: 'center', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Vibe:</span>
           {VIBES.map(v => (
             <button key={v} onClick={() => setVibe(v)}
-              style={{ padding: '5px 12px', borderRadius: 20, border: `1px solid ${vibe === v ? '#f43f5e' : 'rgba(225,29,72,0.2)'}`, background: vibe === v ? 'rgba(244,63,94,0.15)' : 'transparent', color: vibe === v ? '#f43f5e' : 'rgba(255,255,255,0.6)', fontSize: '0.78rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'DM Sans' }}>
+              style={{ padding: '5px 12px', borderRadius: 20, border: `1px solid ${vibe === v ? 'var(--indigo)' : 'var(--border)'}`, background: vibe === v ? 'var(--indigo3)' : 'transparent', color: vibe === v ? '#a5b4fc' : 'var(--gray)', fontSize: '0.78rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'Inter, sans-serif', transition: 'all 0.2s' }}>
               {v}
             </button>
           ))}
         </div>
 
         <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', alignItems: 'center' }}>
-          <div style={{ display: 'flex', gap: 6 }}>
-            <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.78rem', alignSelf: 'center' }}>Country:</span>
+          <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+            <span style={{ color: 'var(--gray)', fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Country:</span>
             {COUNTRIES.map(c => (
               <button key={c} onClick={() => setCountry(c)}
-                style={{ padding: '5px 12px', borderRadius: 20, border: `1px solid ${country === c ? '#f43f5e' : 'rgba(225,29,72,0.2)'}`, background: country === c ? 'rgba(244,63,94,0.15)' : 'transparent', color: country === c ? '#f43f5e' : 'rgba(255,255,255,0.6)', fontSize: '0.78rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'DM Sans' }}>
+                style={{ padding: '5px 12px', borderRadius: 20, border: `1px solid ${country === c ? 'var(--indigo)' : 'var(--border)'}`, background: country === c ? 'var(--indigo3)' : 'transparent', color: country === c ? '#a5b4fc' : 'var(--gray)', fontSize: '0.78rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'Inter, sans-serif', transition: 'all 0.2s' }}>
                 {c}
               </button>
             ))}
           </div>
           <select value={sort} onChange={e => setSort(e.target.value)}
-            style={{ marginLeft: 'auto', padding: '6px 12px', background: '#1f1014', border: '1px solid rgba(225,29,72,0.2)', borderRadius: 8, color: 'white', fontFamily: 'DM Sans', fontSize: '0.8rem' }}>
+            style={{ marginLeft: 'auto', padding: '6px 12px', background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 9, color: 'var(--muted)', fontFamily: 'Inter, sans-serif', fontSize: '0.8rem', outline: 'none' }}>
             <option value="rating">⭐ Top Rated</option>
             <option value="reviews">💬 Most Reviewed</option>
           </select>
         </div>
       </div>
 
-      <div style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.82rem', marginBottom: 16 }}>{filtered.length} destinations found</div>
+      <div style={{ color: 'var(--gray)', fontSize: '0.8rem', marginBottom: 16, fontWeight: 500 }}>{filtered.length} destinations found</div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(280px,1fr))', gap: 20 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(280px,1fr))', gap: 18 }}>
         {filtered.map(dest => (
-          <div key={dest.id} style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(225,29,72,0.12)', borderRadius: 18, overflow: 'hidden', transition: 'transform 0.2s, box-shadow 0.2s' }}
-            onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-6px)'; e.currentTarget.style.boxShadow = '0 16px 40px rgba(225,29,72,0.2)'; }}
-            onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'none'; }}>
-            <div style={{ position: 'relative', height: 180 }}>
+          <div key={dest.id} style={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 18, overflow: 'hidden', transition: 'transform 0.25s, border-color 0.25s, box-shadow 0.25s' }}
+            onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-5px)'; e.currentTarget.style.borderColor = 'rgba(99,102,241,0.3)'; e.currentTarget.style.boxShadow = '0 14px 36px rgba(0,0,0,0.3)'; }}
+            onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.boxShadow = 'none'; }}>
+            <div style={{ position: 'relative', height: 175 }}>
               <img src={dest.img} alt={dest.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={e => { e.target.src = 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=400&h=250&fit=crop'; }} />
-              <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(transparent 40%,rgba(0,0,0,0.7))' }} />
-              <div style={{ position: 'absolute', top: 12, right: 12, background: 'rgba(0,0,0,0.6)', borderRadius: 20, padding: '3px 10px', color: '#f59e0b', fontSize: '0.78rem', fontWeight: 700 }}>⭐ {dest.rating}</div>
+              <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(transparent 40%,rgba(0,0,0,0.72))' }} />
+              <div style={{ position: 'absolute', top: 10, right: 10, background: 'rgba(0,0,0,0.55)', borderRadius: 20, padding: '3px 10px', color: '#fbbf24', fontSize: '0.75rem', fontWeight: 700 }}>⭐ {dest.rating}</div>
               <div style={{ position: 'absolute', bottom: 12, left: 12 }}>
-                <div style={{ color: 'white', fontWeight: 800, fontSize: '1.2rem' }}>{dest.name}</div>
-                <div style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.78rem' }}>📍 {dest.country}</div>
+                <div style={{ color: 'white', fontWeight: 800, fontSize: '1.15rem', letterSpacing: '-0.01em' }}>{dest.name}</div>
+                <div style={{ color: 'rgba(255,255,255,0.65)', fontSize: '0.75rem' }}>📍 {dest.country}</div>
               </div>
             </div>
-            <div style={{ padding: '16px' }}>
-              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 12 }}>
-                {dest.tags.map(t => <span key={t} style={{ background: 'rgba(244,63,94,0.1)', border: '1px solid rgba(244,63,94,0.2)', color: '#fda4af', fontSize: '0.68rem', padding: '2px 8px', borderRadius: 10 }}>{t}</span>)}
+            <div style={{ padding: '14px' }}>
+              <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap', marginBottom: 12 }}>
+                {dest.tags.map(t => <span key={t} style={{ background: 'var(--indigo3)', border: '1px solid var(--border2)', color: '#a5b4fc', fontSize: '0.68rem', fontWeight: 600, padding: '2px 8px', borderRadius: 10 }}>{t}</span>)}
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 14 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 7, marginBottom: 14 }}>
                 {[['💰 Budget', dest.budget], ['📅 Days', dest.days], ['🗓️ Best Time', dest.best], ['💬 Reviews', dest.reviews.toLocaleString()]].map(([label, val]) => (
                   <div key={label} style={{ background: 'rgba(255,255,255,0.03)', borderRadius: 8, padding: '6px 10px' }}>
-                    <div style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.68rem' }}>{label}</div>
-                    <div style={{ color: 'white', fontSize: '0.8rem', fontWeight: 600 }}>{val}</div>
+                    <div style={{ color: 'var(--gray)', fontSize: '0.65rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em' }}>{label}</div>
+                    <div style={{ color: 'var(--white)', fontSize: '0.8rem', fontWeight: 600, marginTop: 2 }}>{val}</div>
                   </div>
                 ))}
               </div>
               <button onClick={() => handlePlan(dest)}
-                style={{ width: '100%', padding: '10px', background: 'linear-gradient(135deg,#f43f5e,#9f1239)', border: 'none', borderRadius: 10, color: 'white', fontFamily: 'DM Sans', fontWeight: 700, fontSize: '0.88rem', cursor: 'pointer' }}>
+                style={{ width: '100%', padding: '10px', background: 'linear-gradient(135deg, var(--rose), var(--deep))', border: 'none', borderRadius: 10, color: 'white', fontFamily: 'Inter, sans-serif', fontWeight: 700, fontSize: '0.875rem', cursor: 'pointer', boxShadow: '0 4px 14px var(--glow-rose)', transition: 'all 0.2s' }}
+                onMouseEnter={e => e.target.style.transform = 'translateY(-1px)'}
+                onMouseLeave={e => e.target.style.transform = 'translateY(0)'}>
                 ✈️ Plan This Trip
               </button>
             </div>
