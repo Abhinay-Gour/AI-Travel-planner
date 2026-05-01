@@ -177,7 +177,7 @@ const Navbar = () => {
                 <p>
                   {authMode === 'login'
                     ? 'Your dream trips are waiting. Login to access your personalized travel plans.'
-                    : 'Join 50,000+ travelers who plan smarter with AI. Free to start!'}
+                    : 'Plan smarter with AI. Free to start — no credit card required!'}
                 </p>
                 <div className="auth-perks">
                   {[
