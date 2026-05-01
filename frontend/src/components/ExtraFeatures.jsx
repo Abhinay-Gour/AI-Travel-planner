@@ -128,58 +128,6 @@ export const FestivalCalendar = () => {
   );
 };
 
-/* ─── PNR STATUS ─── */
-const MOCK_PNR = {
-  '1234567890': { train:'Rajdhani Express', no:'12951', from:'New Delhi', to:'Mumbai Central', date:'15 Jan 2025', class:'3A', status:'CONFIRMED', seat:'B2 - 34', departure:'16:55', arrival:'08:35+1' },
-  '9876543210': { train:'Shatabdi Express', no:'12001', from:'New Delhi', to:'Bhopal', date:'20 Jan 2025', class:'CC', status:'WL 3', seat:'Waiting List', departure:'06:00', arrival:'13:55' },
-  '1111111111': { train:'Duronto Express', no:'12213', from:'Mumbai', to:'Delhi', date:'25 Jan 2025', class:'2A', status:'CONFIRMED', seat:'A1 - 12', departure:'23:00', arrival:'14:45+1' },
-};
-
-export const PNRStatus = () => {
-  const [pnr, setPnr] = useState('');
-  const [result, setResult] = useState(null);
-  const [error, setError] = useState('');
-
-  const check = () => {
-    setError('');
-    const data = MOCK_PNR[pnr.trim()];
-    if (data) { setResult(data); }
-    else { setResult(null); setError('PNR not found. Try: 1234567890, 9876543210, or 1111111111'); }
-  };
-
-  return (
-    <section className="pnr-section" id="pnr">
-      <div className="section-label">Train Travel</div>
-      <h2 className="section-title">PNR Status Checker 🚆</h2>
-      <p className="section-sub">Check your train booking status instantly</p>
-      <div className="pnr-widget">
-        <div className="pnr-input-row">
-          <input className="pnr-input" value={pnr} onChange={e => setPnr(e.target.value)} placeholder="Enter 10-digit PNR number" maxLength={10} onKeyDown={e => e.key === 'Enter' && check()} />
-          <button className="pnr-btn" onClick={check}>Check</button>
-        </div>
-        {error && <div style={{color:'#f87171',fontSize:'0.85rem',marginBottom:12}}>{error}</div>}
-        {result && (
-          <div className="pnr-result">
-            <div className="pnr-train-name">{result.train}</div>
-            <div className="pnr-train-no">Train No: {result.no}</div>
-            {[
-              ['From', result.from], ['To', result.to], ['Date', result.date],
-              ['Class', result.class], ['Departure', result.departure], ['Arrival', result.arrival],
-              ['Seat', result.seat], ['Status', result.status],
-            ].map(([k, v]) => (
-              <div key={k} className="pnr-status-row">
-                <span className="pnr-key">{k}</span>
-                <span className={`pnr-val ${v === 'CONFIRMED' ? 'confirmed' : v.startsWith('WL') ? 'waiting' : ''}`}>{v}</span>
-              </div>
-            ))}
-          </div>
-        )}
-        <div className="pnr-note">Demo data. Real integration requires IRCTC API.</div>
-      </div>
-    </section>
-  );
-};
-
 /* ─── GROUP PLANNER ─── */
 export const GroupPlanner = () => {
   const [members, setMembers] = useState(['Rahul', 'Priya', 'Amit']);
@@ -235,59 +183,6 @@ export const GroupPlanner = () => {
             <div key={i} className="split-row">
               <span className="split-name">{e.label}</span>
               <span className="split-amount">{fmt(Math.round(totalBudget * e.pct / members.length))} /person</span>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-};
-
-/* ─── LOYALTY POINTS ─── */
-const REWARDS = [
-  { icon:'☕', name:'Free Coffee', cost:500, locked:false },
-  { icon:'🎒', name:'Travel Bag', cost:2000, locked:false },
-  { icon:'🏨', name:'Hotel Upgrade', cost:5000, locked:true },
-  { icon:'✈️', name:'Flight Discount', cost:8000, locked:true },
-  { icon:'🌴', name:'Free Trip Plan', cost:1000, locked:false },
-  { icon:'💎', name:'Premium Month', cost:3000, locked:true },
-];
-
-export const LoyaltyPoints = () => {
-  const points = 2350;
-  const nextTier = 5000;
-  const progress = Math.round((points / nextTier) * 100);
-
-  return (
-    <section className="loyalty-section" id="loyalty">
-      <div className="section-label">Rewards</div>
-      <h2 className="section-title">Loyalty Points 🏆</h2>
-      <p className="section-sub">Earn points on every trip plan, redeem for rewards</p>
-      <div className="loyalty-widget">
-        <div className="loyalty-header">
-          <div className="loyalty-icon">🏆</div>
-          <div>
-            <div className="loyalty-points">{points.toLocaleString()}</div>
-            <div className="loyalty-label">Total Points Earned</div>
-            <div className="loyalty-tier">⭐ Silver Traveller</div>
-          </div>
-        </div>
-        <div className="loyalty-progress">
-          <div className="loyalty-progress-label">
-            <span>{points} pts</span>
-            <span>Gold at {nextTier} pts</span>
-          </div>
-          <div className="loyalty-bar">
-            <div className="loyalty-bar-fill" style={{width:`${progress}%`}} />
-          </div>
-        </div>
-        <h4 style={{color:'rgba(255,255,255,0.7)',fontSize:'0.9rem',marginBottom:12}}>🎁 Redeem Rewards</h4>
-        <div className="loyalty-rewards">
-          {REWARDS.map((r, i) => (
-            <div key={i} className={`reward-card ${r.locked ? 'locked' : ''}`} onClick={() => !r.locked && alert(`Redeeming: ${r.name} for ${r.cost} points!`)}>
-              <div className="reward-icon">{r.icon}</div>
-              <div className="reward-name">{r.name}</div>
-              <div className="reward-cost">{r.cost} pts {r.locked ? '🔒' : ''}</div>
             </div>
           ))}
         </div>

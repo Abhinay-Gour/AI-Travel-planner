@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from 'react';
-import { useToast } from '../context/ToastContext';
+import React, { useState } from 'react';
 
 // ── TRIP SHARE LINK ──
 export const TripShareLink = ({ tripData }) => {
@@ -39,7 +38,7 @@ export const TripShareLink = ({ tripData }) => {
   );
 };
 
-// ── VISA APPOINTMENT TRACKER ──
+// ── VISA TRACKER ──
 const VISA_DATA = {
   'USA': { docs: ['Valid Passport (6+ months)', 'DS-160 Form', 'Photo (2x2 inch)', 'Bank Statements (6 months)', 'ITR (3 years)', 'Employment Letter', 'Travel Itinerary'], processing: '3-5 weeks', fee: '₹13,000', type: 'B1/B2 Tourist', difficulty: 'Hard' },
   'UK': { docs: ['Valid Passport', 'Online Application (VAF1A)', 'Bank Statements', 'Salary Slips', 'Hotel Bookings', 'Return Tickets', 'Travel Insurance'], processing: '3 weeks', fee: '₹11,000', type: 'Standard Visitor', difficulty: 'Medium' },
@@ -101,83 +100,6 @@ export const VisaTracker = () => {
           </>
         )}
       </div>
-    </section>
-  );
-};
-
-// ── TRAVEL BUDDY FINDER ──
-const BUDDIES = [
-  { id: 1, name: 'Rahul', age: 26, dest: 'Goa', dates: 'Dec 20-27', style: 'Budget', interests: ['Beach', 'Food', 'Nightlife'], avatar: '👨', city: 'Mumbai' },
-  { id: 2, name: 'Priya', age: 24, dest: 'Manali', dates: 'Jan 5-12', style: 'Mid-Range', interests: ['Mountains', 'Trekking', 'Photography'], avatar: '👩', city: 'Delhi' },
-  { id: 3, name: 'Amit', age: 29, dest: 'Bali', dates: 'Feb 10-20', style: 'Mid-Range', interests: ['Culture', 'Food', 'Temples'], avatar: '🧑', city: 'Bangalore' },
-  { id: 4, name: 'Sneha', age: 27, dest: 'Goa', dates: 'Dec 22-29', style: 'Budget', interests: ['Beach', 'Yoga', 'Sunsets'], avatar: '👩', city: 'Pune' },
-  { id: 5, name: 'Vikram', age: 31, dest: 'Rajasthan', dates: 'Jan 15-22', style: 'Luxury', interests: ['History', 'Culture', 'Photography'], avatar: '👨', city: 'Hyderabad' },
-];
-
-export const TravelBuddyFinder = () => {
-  const [dest, setDest] = useState('');
-  const [style, setStyle] = useState('');
-  const [connected, setConnected] = useState([]);
-  const toast = useToast();
-
-  const filtered = BUDDIES.filter(b =>
-    (!dest || b.dest.toLowerCase().includes(dest.toLowerCase())) &&
-    (!style || b.style === style)
-  );
-
-  const connect = (id) => {
-    if (!connected.includes(id)) {
-      setConnected(c => [...c, id]);
-      toast('Connection request sent! 🎉', 'success');
-    }
-  };
-
-  return (
-    <section style={{ padding: '80px 6vw' }} id="travel-buddy">
-      <div className="section-label">Find Companions</div>
-      <h2 className="section-title">Travel Buddy Finder 👥</h2>
-      <p className="section-sub">Find travelers going to the same destination — plan together, travel together</p>
-
-      <div style={{ display: 'flex', gap: 12, marginBottom: 24, flexWrap: 'wrap' }}>
-        <input value={dest} onChange={e => setDest(e.target.value)} placeholder="🔍 Search destination..."
-          style={{ flex: 1, minWidth: 180, padding: '10px 16px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(225,29,72,0.2)', borderRadius: 10, color: 'white', fontFamily: 'DM Sans', fontSize: '0.9rem' }} />
-        <select value={style} onChange={e => setStyle(e.target.value)}
-          style={{ padding: '10px 16px', background: '#1f1014', border: '1px solid rgba(225,29,72,0.2)', borderRadius: 10, color: 'white', fontFamily: 'DM Sans', fontSize: '0.9rem' }}>
-          <option value="">All Styles</option>
-          <option value="Budget">💸 Budget</option>
-          <option value="Mid-Range">💳 Mid-Range</option>
-          <option value="Luxury">💎 Luxury</option>
-        </select>
-      </div>
-
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(260px,1fr))', gap: 16 }}>
-        {filtered.map(b => (
-          <div key={b.id} style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(225,29,72,0.12)', borderRadius: 16, padding: 20, transition: 'transform 0.2s' }}
-            onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-4px)'}
-            onMouseLeave={e => e.currentTarget.style.transform = 'translateY(0)'}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 14 }}>
-              <div style={{ fontSize: '2.5rem' }}>{b.avatar}</div>
-              <div>
-                <div style={{ color: 'white', fontWeight: 700 }}>{b.name}, {b.age}</div>
-                <div style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.78rem' }}>📍 {b.city}</div>
-              </div>
-            </div>
-            <div style={{ marginBottom: 12 }}>
-              <div style={{ color: '#f43f5e', fontWeight: 700, fontSize: '0.9rem' }}>✈️ {b.dest}</div>
-              <div style={{ color: 'rgba(255,255,255,0.6)', fontSize: '0.8rem' }}>📅 {b.dates}</div>
-              <div style={{ color: 'rgba(255,255,255,0.6)', fontSize: '0.8rem' }}>💼 {b.style}</div>
-            </div>
-            <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 14 }}>
-              {b.interests.map(i => <span key={i} style={{ background: 'rgba(244,63,94,0.1)', border: '1px solid rgba(244,63,94,0.2)', color: '#fda4af', fontSize: '0.7rem', padding: '2px 8px', borderRadius: 10 }}>{i}</span>)}
-            </div>
-            <button onClick={() => connect(b.id)} disabled={connected.includes(b.id)}
-              style={{ width: '100%', padding: '9px', background: connected.includes(b.id) ? 'rgba(16,185,129,0.15)' : 'linear-gradient(135deg,#f43f5e,#9f1239)', border: connected.includes(b.id) ? '1px solid rgba(16,185,129,0.3)' : 'none', borderRadius: 10, color: connected.includes(b.id) ? '#10b981' : 'white', fontFamily: 'DM Sans', fontWeight: 700, fontSize: '0.85rem', cursor: connected.includes(b.id) ? 'default' : 'pointer' }}>
-              {connected.includes(b.id) ? '✓ Request Sent' : '👋 Connect'}
-            </button>
-          </div>
-        ))}
-      </div>
-      <p style={{ textAlign: 'center', color: 'rgba(255,255,255,0.35)', fontSize: '0.78rem', marginTop: 20 }}>Demo data — real matching requires backend integration</p>
     </section>
   );
 };

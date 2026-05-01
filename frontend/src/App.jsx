@@ -17,13 +17,13 @@ import HotelBooking from './components/HotelBooking';
 import TripComparison from './components/TripComparison';
 import VisaInfo from './components/VisaInfo';
 import CurrencyConverter from './components/CurrencyConverter';
-import { LanguageTranslator, FestivalCalendar, PNRStatus, GroupPlanner, LoyaltyPoints } from './components/ExtraFeatures';
+import { LanguageTranslator, FestivalCalendar, GroupPlanner } from './components/ExtraFeatures';
 import CostCalculator from './components/CostCalculator';
 import TravelInsurance from './components/TravelInsurance';
 import BudgetOptimizer from './components/BudgetOptimizer';
 import Leaderboard from './components/Leaderboard';
 import MultiCityPlanner from './components/MultiCityPlanner';
-import { VisaTracker, TravelBuddyFinder } from './components/TravelExtras';
+import { VisaTracker } from './components/TravelExtras';
 import { TravelChecklist, TripDashboard } from './components/TravelTools';
 import DestinationsExplorer from './components/DestinationsExplorer';
 import Pricing from './components/Pricing';
@@ -122,16 +122,13 @@ const HomePage = () => {
           <VisaTracker />
           <TravelInsurance />
           <TravelChecklist />
-          <PNRStatus />
           <GroupPlanner />
           <LanguageTranslator />
         </>}
         {activeTab === 'explore' && <>
           <FestivalCalendar />
-          <LoyaltyPoints />
         </>}
         {activeTab === 'community' && <>
-          <TravelBuddyFinder />
           <Leaderboard />
         </>}
       </div>

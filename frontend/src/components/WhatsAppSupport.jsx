@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
-const WHATSAPP_NUMBER = '919876543210'; // Replace with your real WhatsApp number
-const MESSAGE = encodeURIComponent('Hi! I need help with AI Travel Planner 🌍\n\nWebsite: https://ai-travel-planner.vercel.app');
+const WHATSAPP_NUMBER = '916265718110';
+const MESSAGE = encodeURIComponent('Hi! I need help with AI Travel Planner 🌍\n\nWebsite: https://aitravelplanner-seven.vercel.app');
 
 const WhatsAppSupport = () => {
   const [tooltip, setTooltip] = useState(false);
