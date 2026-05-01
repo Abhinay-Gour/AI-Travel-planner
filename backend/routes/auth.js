@@ -3,6 +3,7 @@ import { body, validationResult } from 'express-validator';
 import User from '../models/User.js';
 import { generateToken, generateRefreshToken, verifyRefreshToken, authenticateToken } from '../middleware/auth.js';
 import { sendWelcomeEmail, sendPasswordResetEmail } from '../utils/emailService.js';
+import { sendWelcomeSMS, sendPasswordResetSMS } from '../utils/communicationService.js';
 import crypto from 'crypto';
 import rateLimit from 'express-rate-limit';
 
@@ -83,11 +84,14 @@ router.post('/register', registerLimiter, validateRegistration, async (req, res)
     const token = generateToken(user._id);
     const refreshToken = generateRefreshToken(user._id);
 
-    try {
-      await sendWelcomeEmail(user.email, user.name, user.emailVerificationToken);
-    } catch (emailError) {
-      console.error('Welcome email failed:', emailError);
-    }
+    // Send welcome email + SMS in background — don't block response
+    Promise.allSettled([
+      sendWelcomeEmail(user.email, user.name, user.emailVerificationToken),
+      sendWelcomeSMS(user.phone, user.name)
+    ]).then(results => {
+      console.log('📧 Welcome email:', results[0].status);
+      console.log('📱 Welcome SMS:', results[1].status);
+    });
 
     res.status(201).json({
       success: true,
@@ -241,16 +245,18 @@ router.post('/forgot-password', forgotPasswordLimiter, [
     user.passwordResetExpires = Date.now() + 10 * 60 * 1000; // 10 minutes
     await user.save();
 
-    // Send reset email
-    try {
-      await sendPasswordResetEmail(user.email, user.name, resetToken);
-    } catch (emailError) {
-      console.error('Password reset email failed:', emailError);
-    }
+    // Send reset email + SMS in background
+    Promise.allSettled([
+      sendPasswordResetEmail(user.email, user.name, resetToken),
+      sendPasswordResetSMS(user.phone, user.name, resetToken)
+    ]).then(results => {
+      console.log('📧 Reset email:', results[0].status);
+      console.log('📱 Reset SMS:', results[1].status);
+    });
 
     res.json({
       success: true,
-      message: 'Password reset link sent to your email'
+      message: 'Password reset link sent to your email and phone'
     });
 
   } catch (error) {

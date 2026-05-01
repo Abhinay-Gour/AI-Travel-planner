@@ -3,24 +3,32 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-// Create transporter
-const createTransporter = () => {
-  return nodemailer.createTransport({
-    host: process.env.EMAIL_HOST,
-    port: process.env.EMAIL_PORT,
-    secure: false, // true for 465, false for other ports
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS
-    }
-  });
-};
+// Single persistent transporter — reuse connection pool
+const transporter = nodemailer.createTransport({
+  host: process.env.EMAIL_HOST,
+  port: parseInt(process.env.EMAIL_PORT) || 587,
+  secure: false,
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS
+  },
+  pool: true,          // reuse connections
+  maxConnections: 5,
+  maxMessages: 100,
+  rateDelta: 1000,
+  rateLimit: 5,
+  tls: { rejectUnauthorized: false }
+});
+
+// Verify connection on startup
+transporter.verify((err) => {
+  if (err) console.error('❌ Email transporter error:', err.message);
+  else console.log('✅ Email transporter ready');
+});
 
 // Send welcome email
 export const sendWelcomeEmail = async (email, name, verificationToken) => {
   try {
-    const transporter = createTransporter();
-    
     const verificationUrl = `${process.env.FRONTEND_URL}/verify-email/${verificationToken}`;
     
     const mailOptions = {
@@ -85,8 +93,6 @@ export const sendWelcomeEmail = async (email, name, verificationToken) => {
 // Send password reset email
 export const sendPasswordResetEmail = async (email, name, resetToken) => {
   try {
-    const transporter = createTransporter();
-    
     const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
     
     const mailOptions = {
@@ -149,7 +155,6 @@ export const sendPasswordResetEmail = async (email, name, resetToken) => {
 // Send payment success email
 export const sendPaymentSuccessEmail = async (email, name, plan) => {
   try {
-    const transporter = createTransporter();
     const planDetails = {
       basic:     { name: 'Basic',     price: '₹499', trips: '5 trips', color: '#3182ce' },
       pro:       { name: 'Pro',       price: '₹999', trips: '20 trips', color: '#e53e3e' },
@@ -264,7 +269,6 @@ const generateTripText = (name, tripData) => {
 // Send trip details email with full itinerary (MakeMyTrip style)
 export const sendTripDetailsEmail = async (email, name, tripData) => {
   try {
-    const transporter = createTransporter();
     const plainText = generateTripText(name, tripData);
 
     const dailyItineraryHtml = tripData.dailyItinerary?.map(day => `
