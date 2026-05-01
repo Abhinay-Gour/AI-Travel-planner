@@ -9,22 +9,17 @@ import { useEffect } from 'react';
 import { trackPage } from './services/analyticsService';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
-import GlobeDashboard from './components/GlobeDashboard';
 import StatsCounter from './components/StatsCounter';
 import Features from './components/Features';
 import Transport from './components/Transport';
 import HotelBooking from './components/HotelBooking';
-import TripComparison from './components/TripComparison';
 import VisaInfo from './components/VisaInfo';
 import CurrencyConverter from './components/CurrencyConverter';
-import { LanguageTranslator, FestivalCalendar, GroupPlanner } from './components/ExtraFeatures';
+import { FestivalCalendar } from './components/ExtraFeatures';
 import CostCalculator from './components/CostCalculator';
 import TravelInsurance from './components/TravelInsurance';
-import BudgetOptimizer from './components/BudgetOptimizer';
-import Leaderboard from './components/Leaderboard';
-import MultiCityPlanner from './components/MultiCityPlanner';
 import { VisaTracker } from './components/TravelExtras';
-import { TravelChecklist, TripDashboard } from './components/TravelTools';
+import { TravelChecklist } from './components/TravelTools';
 import DestinationsExplorer from './components/DestinationsExplorer';
 import Pricing from './components/Pricing';
 import FAQ from './components/FAQ';
@@ -38,7 +33,6 @@ import BottomNav from './components/BottomNav';
 import LoadingScreen from './components/LoadingScreen';
 import ScrollToTop from './components/ScrollToTop';
 import CookieNotice from './components/CookieNotice';
-import FeedbackWidget from './components/FeedbackWidget';
 import WhatsAppSupport from './components/WhatsAppSupport';
 import NotFound from './components/NotFound';
 import { PrivacyPolicy, TermsOfService } from './components/LegalPages';
@@ -60,17 +54,11 @@ const PageWrapper = ({ children }) => {
 const TABS = [
   { id: 'plan', label: '✈️ Plan Trip' },
   { id: 'tools', label: '🛠️ Tools' },
-  { id: 'explore', label: '🌍 Explore' },
-  { id: 'community', label: '👥 Community' },
 ];
 
-// Home page — sections grouped into tabs
+// Home page
 const HomePage = () => {
   const [activeTab, setActiveTab] = useState('plan');
-  const handleDestSelect = (dest) => {
-    window.dispatchEvent(new CustomEvent('selectDestination', { detail: dest }));
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
 
   const scrollToTabs = () => {
     document.getElementById('tab-content')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -80,7 +68,6 @@ const HomePage = () => {
     <PageWrapper>
       <Hero />
       <StatsCounter />
-      <GlobeDashboard onSelectDestination={handleDestSelect} />
 
       {/* Sticky Tab Navigation */}
       <div style={{
@@ -110,11 +97,7 @@ const HomePage = () => {
       <div id="tab-content">
         {activeTab === 'plan' && <>
           <Features />
-          <TripComparison />
-          <MultiCityPlanner />
-          <BudgetOptimizer />
           <CostCalculator />
-          <TripDashboard />
         </>}
         {activeTab === 'tools' && <>
           <CurrencyConverter />
@@ -122,14 +105,7 @@ const HomePage = () => {
           <VisaTracker />
           <TravelInsurance />
           <TravelChecklist />
-          <GroupPlanner />
-          <LanguageTranslator />
-        </>}
-        {activeTab === 'explore' && <>
           <FestivalCalendar />
-        </>}
-        {activeTab === 'community' && <>
-          <Leaderboard />
         </>}
       </div>
 
@@ -197,7 +173,6 @@ function App() {
                 <BottomNav />
                 <ScrollToTop />
                 <WhatsAppSupport />
-                <FeedbackWidget />
                 <CookieNotice />
               </BrowserRouter>
             </AuthModalProvider>
