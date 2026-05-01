@@ -1,44 +1,37 @@
 .bottom-nav {
   display: none;
   position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
+  bottom: 0; left: 0; right: 0;
   z-index: 997;
-  background: rgba(15,10,11,0.97);
-  backdrop-filter: blur(20px);
-  border-top: 1px solid rgba(225,29,72,0.2);
+  background: rgba(10,15,30,0.96);
+  backdrop-filter: blur(24px);
+  border-top: 1px solid var(--border);
   padding: 8px 0 env(safe-area-inset-bottom, 8px);
   justify-content: space-around;
   align-items: center;
 }
 
 .bottom-nav-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 3px;
+  display: flex; flex-direction: column;
+  align-items: center; gap: 3px;
   text-decoration: none;
-  padding: 4px 12px;
+  padding: 6px 14px;
   border-radius: 12px;
   transition: all 0.2s;
-  color: rgba(255,255,255,0.45);
-  min-width: 56px;
+  color: var(--gray);
+  min-width: 52px;
 }
 
 .bottom-nav-item.active {
-  color: var(--rose);
+  color: var(--indigo);
+  background: var(--indigo3);
 }
 
-.bottom-nav-item.active .bottom-nav-icon {
-  transform: scale(1.2);
-}
-
-.bottom-nav-icon { font-size: 1.3rem; transition: transform 0.2s; }
-.bottom-nav-label { font-size: 0.65rem; font-weight: 600; }
+.bottom-nav-icon { font-size: 1.2rem; transition: transform 0.2s; }
+.bottom-nav-item.active .bottom-nav-icon { transform: scale(1.15); }
+.bottom-nav-label { font-size: 0.62rem; font-weight: 600; letter-spacing: 0.02em; }
 
 @media (max-width: 768px) {
   .bottom-nav { display: flex; }
-  /* Push content above bottom nav */
-  body { padding-bottom: 70px; }
+  body { padding-bottom: 68px; }
 }

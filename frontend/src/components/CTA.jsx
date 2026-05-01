@@ -34,7 +34,7 @@ const CTA = () => {
       <div className="cta-trust">
         <span>✅ No credit card required</span>
         <span>✅ Free forever plan</span>
-        <span>✅ 50,000+ trips planned</span>
+        <span>✅ AI-powered in seconds</span>
       </div>
     </section>
   );

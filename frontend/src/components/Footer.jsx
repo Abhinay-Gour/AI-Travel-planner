@@ -19,7 +19,7 @@ const Footer = () => {
             <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" aria-label="Instagram">📸</a>
             <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" aria-label="Twitter">🐦</a>
             <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" aria-label="YouTube">▶️</a>
-            <a href="https://wa.me/919876543210" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp">💬</a>
+            <a href="https://wa.me/916265718110" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp">💬</a>
           </div>
         </div>
 
@@ -37,11 +37,10 @@ const Footer = () => {
         {/* Features */}
         <div className="footer-col">
           <h4>Features</h4>
-          <a href="/#budget-optimizer">💡 Budget Optimizer</a>
-          <a href="/#multi-city">🗺️ Multi-City Planner</a>
           <a href="/#currency">💱 Currency Converter</a>
           <a href="/#visa-tracker">🛂 Visa Tracker</a>
-          <a href="/#stories">✍️ Travel Stories</a>
+          <a href="/#checklist">✅ Travel Checklist</a>
+          <a href="/#festivals">🎉 Festival Calendar</a>
           <a href="/#calculator">💰 Cost Calculator</a>
         </div>
 
@@ -50,10 +49,9 @@ const Footer = () => {
           <h4>Support</h4>
           <a href="/#faq">❓ FAQ</a>
           <a href="mailto:abhinaygour59@gmail.com">📧 Contact Us</a>
-          <a href="https://wa.me/919876543210" target="_blank" rel="noopener noreferrer">💬 WhatsApp Support</a>
+          <a href="https://wa.me/916265718110" target="_blank" rel="noopener noreferrer">💬 WhatsApp Support</a>
           <Link to="/privacy">🔒 Privacy Policy</Link>
           <Link to="/terms">📄 Terms of Service</Link>
-          <a href="/#feedback">⭐ Give Feedback</a>
         </div>
       </div>
 
