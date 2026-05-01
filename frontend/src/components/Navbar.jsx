@@ -100,33 +100,37 @@ const Navbar = () => {
       <nav className="nav">
         <Link to="/" className="logo">
           <span className="logo-icon">✈</span>
-          AI Travel Planner
+          <div className="logo-text">
+            <span className="logo-title">AI Travel Planner</span>
+            <span className="logo-sub">Powered by Gemini AI</span>
+          </div>
         </Link>
 
         <GlobalSearch />
 
         <ul className="nav-links">
           <li><Link to="/" className={isActive('/') ? 'nav-active' : ''}>Home</Link></li>
-          <li><Link to="/transport" className={isActive('/transport') ? 'nav-active' : ''}>✈️ Transport</Link></li>
-          <li><Link to="/hotels" className={isActive('/hotels') ? 'nav-active' : ''}>🏨 Hotels</Link></li>
-          <li><Link to="/wishlist" className={isActive('/wishlist') ? 'nav-active' : ''}>❤️ Wishlist</Link></li>
-          <li><Link to="/packing" className={isActive('/packing') ? 'nav-active' : ''}>🎒 Packing</Link></li>
-          <li><Link to="/mood-quiz" className={isActive('/mood-quiz') ? 'nav-active' : ''}>🎯 Quiz</Link></li>
-          <li><Link to="/destinations" className={isActive('/destinations') ? 'nav-active' : ''}>🌍 Explore</Link></li>
+          <li><Link to="/destinations" className={isActive('/destinations') ? 'nav-active' : ''}>Explore</Link></li>
+          <li><Link to="/packing" className={isActive('/packing') ? 'nav-active' : ''}>Packing</Link></li>
+          <li><Link to="/mood-quiz" className={isActive('/mood-quiz') ? 'nav-active' : ''}>Quiz</Link></li>
+          <li><Link to="/wishlist" className={isActive('/wishlist') ? 'nav-active' : ''}>Wishlist</Link></li>
+        </ul>
+
+        <div className="nav-actions">
           {isAuthenticated ? (
             <>
-              <li><span className="user-greeting">Hi, {user?.name?.split(' ')[0]}!</span></li>
-              <li><button onClick={() => setShowTrips(true)} className="nav-btn my-trips-btn">My Trips</button></li>
-              <li><button onClick={handleLogout} className="nav-btn logout-btn">Logout</button></li>
+              <span className="user-greeting">Hi, {user?.name?.split(' ')[0]}!</span>
+              <button onClick={() => setShowTrips(true)} className="nav-btn my-trips-btn">My Trips</button>
+              <button onClick={handleLogout} className="nav-btn logout-btn">Logout</button>
             </>
           ) : (
             <>
-              <li><button onClick={() => openAuthModal('login')} className="nav-btn login-btn">Login</button></li>
-              <li><button onClick={() => openAuthModal('signup')} className="nav-btn signup-btn">Sign Up</button></li>
+              <button onClick={() => openAuthModal('login')} className="nav-btn login-btn">Login</button>
+              <button onClick={() => openAuthModal('signup')} className="nav-btn signup-btn">Sign Up</button>
             </>
           )}
-          <li><button className="theme-toggle" onClick={toggleTheme} title="Toggle theme">{isDark ? '☀️' : '🌙'}</button></li>
-        </ul>
+          <button className="theme-toggle" onClick={toggleTheme} title="Toggle theme">{isDark ? '☀️' : '🌙'}</button>
+        </div>
 
         <button className={`hamburger ${isMenuOpen ? 'open' : ''}`} onClick={toggleMenu} aria-label="Menu">
           <span></span><span></span><span></span>
@@ -136,22 +140,23 @@ const Navbar = () => {
       {/* Mobile Menu */}
       <div className={`mobile-menu ${isMenuOpen ? 'open' : ''}`}>
         <Link to="/" onClick={closeMenu}>Home</Link>
-        <Link to="/transport" onClick={closeMenu}>✈️ Transport</Link>
-        <Link to="/hotels" onClick={closeMenu}>🏨 Hotels</Link>
-        <Link to="/wishlist" onClick={closeMenu}>❤️ Wishlist</Link>
-        <Link to="/packing" onClick={closeMenu}>🎒 Packing</Link>
-        <Link to="/mood-quiz" onClick={closeMenu}>🎯 Mood Quiz</Link>
-        <Link to="/destinations" onClick={closeMenu}>🌍 Explore</Link>
+        <Link to="/destinations" onClick={closeMenu}>Explore</Link>
+        <Link to="/packing" onClick={closeMenu}>Packing List</Link>
+        <Link to="/mood-quiz" onClick={closeMenu}>Mood Quiz</Link>
+        <Link to="/wishlist" onClick={closeMenu}>Wishlist</Link>
+        <Link to="/transport" onClick={closeMenu}>Transport</Link>
+        <Link to="/hotels" onClick={closeMenu}>Hotels</Link>
+        <div className="mobile-divider" />
         {isAuthenticated ? (
           <>
-            <span className="user-greeting mobile">Hi, {user?.name?.split(' ')[0]}!</span>
+            <span className="user-greeting mobile">Hi, {user?.name?.split(' ')[0]}! 👋</span>
             <button onClick={() => { setShowTrips(true); closeMenu(); }} className="nav-btn my-trips-btn mobile">My Trips</button>
             <button onClick={handleLogout} className="nav-btn logout-btn mobile">Logout</button>
           </>
         ) : (
           <>
             <button onClick={() => openAuthModal('login')} className="nav-btn login-btn mobile">Login</button>
-            <button onClick={() => openAuthModal('signup')} className="nav-btn signup-btn mobile">Sign Up</button>
+            <button onClick={() => openAuthModal('signup')} className="nav-btn signup-btn mobile">Sign Up Free</button>
           </>
         )}
       </div>

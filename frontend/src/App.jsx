@@ -72,9 +72,9 @@ const HomePage = () => {
 
       {/* Sticky Tab Navigation */}
       <div style={{
-        position: 'sticky', top: 73, zIndex: 90,
-        background: 'rgba(15,10,11,0.96)', backdropFilter: 'blur(16px)',
-        borderBottom: '1px solid rgba(225,29,72,0.15)',
+        position: 'sticky', top: 64, zIndex: 90,
+        background: 'rgba(10,15,30,0.92)', backdropFilter: 'blur(24px)',
+        borderBottom: '1px solid rgba(255,255,255,0.05)',
         padding: '0 6vw',
       }}>
         <div style={{ display: 'flex', gap: 0, overflowX: 'auto', scrollbarWidth: 'none' }}>
@@ -82,12 +82,13 @@ const HomePage = () => {
             <button key={tab.id}
               onClick={() => { setActiveTab(tab.id); scrollToTabs(); }}
               style={{
-                padding: '14px 22px',
+                padding: '14px 20px',
                 background: 'none', border: 'none',
-                borderBottom: `2px solid ${activeTab === tab.id ? '#f43f5e' : 'transparent'}`,
-                color: activeTab === tab.id ? '#f43f5e' : 'rgba(255,255,255,0.5)',
-                fontFamily: 'DM Sans', fontWeight: 600, fontSize: '0.88rem',
+                borderBottom: `2px solid ${activeTab === tab.id ? '#6366f1' : 'transparent'}`,
+                color: activeTab === tab.id ? '#a5b4fc' : 'rgba(241,245,249,0.4)',
+                fontFamily: 'Inter, sans-serif', fontWeight: 600, fontSize: '0.82rem',
                 cursor: 'pointer', whiteSpace: 'nowrap', transition: 'all 0.2s',
+                letterSpacing: '0.01em',
               }}>
               {tab.label}
             </button>
