@@ -199,8 +199,8 @@ const Navbar = () => {
             <div className="auth-form-panel">
               <div className="auth-header">
                 <div className="auth-header-text">
-                  <h2>{authMode === 'login' ? 'Sign In' : 'Create Account'}</h2>
-                  <p>{authMode === 'login' ? 'Enter your credentials to continue' : 'Fill in your details to get started'}</p>
+                  <h2>{authMode === 'login' ? 'Sign In' : authMode === 'signup' ? 'Create Account' : 'Reset Password'}</h2>
+                  <p>{authMode === 'login' ? 'Enter your credentials to continue' : authMode === 'signup' ? 'Fill in your details to get started' : 'We will send a reset link to your email'}</p>
                 </div>
                 <button className="close-btn" onClick={closeAuth}>✕</button>
               </div>
@@ -216,7 +216,7 @@ const Navbar = () => {
                     <div style={{textAlign:'center',padding:'32px 0'}}>
                       <div style={{fontSize:'3rem',marginBottom:'16px'}}>📧</div>
                       <h3 style={{color:'var(--white)',marginBottom:'8px'}}>Check Your Email!</h3>
-                      <p style={{color:'rgba(255,255,255,0.6)',fontSize:'0.9rem'}}>We sent a password reset link to <strong style={{color:'var(--rose)'}}>{forgotEmail}</strong></p>
+                      <p style={{color:'rgba(255,255,255,0.6)',fontSize:'0.9rem'}}>We sent a reset link to <strong style={{color:'var(--rose)'}}>{forgotEmail}</strong></p>
                       <p style={{color:'rgba(255,255,255,0.4)',fontSize:'0.8rem',marginTop:'8px'}}>Link expires in 10 minutes</p>
                     </div>
                   ) : (
@@ -224,7 +224,7 @@ const Navbar = () => {
                       <p style={{color:'rgba(255,255,255,0.6)',fontSize:'0.9rem',marginBottom:'20px'}}>Enter your email and we'll send you a reset link.</p>
                       <div className="form-group">
                         <label>📧 Email Address</label>
-                        <input type="email" placeholder="you@example.com" value={forgotEmail} onChange={e => setForgotEmail(e.target.value)} required />
+                        <input type="email" placeholder="you@example.com" value={forgotEmail} onChange={e => { setForgotEmail(e.target.value); setAuthError(''); }} required />
                       </div>
                       {authError && <div className="auth-error">⚠️ {authError}</div>}
                       <button type="submit" className="auth-submit" disabled={forgotLoading}>
@@ -234,39 +234,38 @@ const Navbar = () => {
                   )}
                 </div>
               ) : (
-                {authMode === 'signup' && (
+                <form className="auth-form" onSubmit={handleSubmit}>
+                  {authMode === 'signup' && (
+                    <div className="form-group">
+                      <label>👤 Full Name</label>
+                      <input type="text" name="name" placeholder="Rahul Sharma" value={formData.name} onChange={handleInputChange} required minLength={2} />
+                    </div>
+                  )}
                   <div className="form-group">
-                    <label>👤 Full Name</label>
-                    <input type="text" name="name" placeholder="Rahul Sharma" value={formData.name} onChange={handleInputChange} required minLength={2} />
+                    <label>📧 Email Address</label>
+                    <input type="email" name="email" placeholder="you@example.com" value={formData.email} onChange={handleInputChange} required />
                   </div>
-                )}
-                <div className="form-group">
-                  <label>📧 Email Address</label>
-                  <input type="email" name="email" placeholder="you@example.com" value={formData.email} onChange={handleInputChange} required />
-                </div>
-                {authMode === 'signup' && (
+                  {authMode === 'signup' && (
+                    <div className="form-group">
+                      <label>📱 Phone Number</label>
+                      <input type="tel" name="phone" placeholder="+91 98765 43210" value={formData.phone} onChange={handleInputChange} required />
+                    </div>
+                  )}
                   <div className="form-group">
-                    <label>📱 Phone Number</label>
-                    <input type="tel" name="phone" placeholder="+91 98765 43210" value={formData.phone} onChange={handleInputChange} required />
+                    <label>🔒 Password</label>
+                    <input type="password" name="password" placeholder="Min 6 characters" value={formData.password} onChange={handleInputChange} required minLength={6} />
                   </div>
-                )}
-                <div className="form-group">
-                  <label>🔒 Password</label>
-                  <input type="password" name="password" placeholder="Min 6 characters" value={formData.password} onChange={handleInputChange} required minLength={6} />
-                </div>
-                {authMode === 'signup' && (
-                  <div className="form-group">
-                    <label>🔒 Confirm Password</label>
-                    <input type="password" name="confirmPassword" placeholder="Repeat password" value={formData.confirmPassword} onChange={handleInputChange} required />
-                  </div>
-                )}
-
-                {authError && <div className="auth-error">⚠️ {authError}</div>}
-
-                <button type="submit" className="auth-submit" disabled={authLoading}>
-                  {authLoading ? '⏳ Please wait...' : authMode === 'login' ? '🚀 Sign In' : '🎉 Create Account'}
-                </button>
-              </form>
+                  {authMode === 'signup' && (
+                    <div className="form-group">
+                      <label>🔒 Confirm Password</label>
+                      <input type="password" name="confirmPassword" placeholder="Repeat password" value={formData.confirmPassword} onChange={handleInputChange} required />
+                    </div>
+                  )}
+                  {authError && <div className="auth-error">⚠️ {authError}</div>}
+                  <button type="submit" className="auth-submit" disabled={authLoading}>
+                    {authLoading ? '⏳ Please wait...' : authMode === 'login' ? '🚀 Sign In' : '🎉 Create Account'}
+                  </button>
+                </form>
               )}
 
               <div className="auth-footer">
