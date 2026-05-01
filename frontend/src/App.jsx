@@ -21,7 +21,6 @@ import { LanguageTranslator, FestivalCalendar, PNRStatus, GroupPlanner, LoyaltyP
 import CostCalculator from './components/CostCalculator';
 import TravelInsurance from './components/TravelInsurance';
 import BudgetOptimizer from './components/BudgetOptimizer';
-import TravelStories from './components/TravelStories';
 import Leaderboard from './components/Leaderboard';
 import MultiCityPlanner from './components/MultiCityPlanner';
 import { VisaTracker, TravelBuddyFinder } from './components/TravelExtras';
@@ -132,7 +131,6 @@ const HomePage = () => {
           <LoyaltyPoints />
         </>}
         {activeTab === 'community' && <>
-          <TravelStories />
           <TravelBuddyFinder />
           <Leaderboard />
         </>}
