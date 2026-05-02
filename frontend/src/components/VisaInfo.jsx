@@ -51,10 +51,12 @@ const VisaInfo = () => {
       <p className="section-sub">Indian passport visa requirements for 24+ countries</p>
 
       <input
-        style={{ width:'100%', maxWidth:400, background:'rgba(255,255,255,0.05)', border:'1.5px solid rgba(255,255,255,0.1)', borderRadius:12, padding:'11px 16px', color:'white', fontFamily:'DM Sans,sans-serif', fontSize:'0.9rem', outline:'none', marginBottom:16, boxSizing:'border-box' }}
+        style={{ width:'100%', maxWidth:400, background:'rgba(255,255,255,0.04)', border:'1.5px solid var(--border)', borderRadius:11, padding:'11px 16px', color:'var(--white)', fontFamily:'Inter,sans-serif', fontSize:'0.88rem', outline:'none', marginBottom:16, boxSizing:'border-box', transition:'border-color 0.15s' }}
         placeholder="🔍 Search country..."
         value={search}
         onChange={e => setSearch(e.target.value)}
+        onFocus={e => e.target.style.borderColor='var(--indigo)'}
+        onBlur={e => e.target.style.borderColor='var(--border)'}
       />
 
       <div className="visa-filter-tabs">

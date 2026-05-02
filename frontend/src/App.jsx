@@ -37,6 +37,7 @@ import WhatsAppSupport from './components/WhatsAppSupport';
 import NotFound from './components/NotFound';
 import { PrivacyPolicy, TermsOfService } from './components/LegalPages';
 import ResetPassword from './components/ResetPassword';
+import TripCountdown from './components/TripCountdown';
 
 // Page transition wrapper
 const PageWrapper = ({ children }) => {
@@ -68,6 +69,7 @@ const HomePage = () => {
   return (
     <PageWrapper>
       <Hero />
+      <TripCountdown />
       <StatsCounter />
 
       {/* Sticky Tab Navigation */}
