@@ -23,7 +23,7 @@ const CTA = () => {
         Next Adventure?
       </h2>
       <p className="section-sub">
-        Join thousands of travelers creating amazing journeys with AI. It's free to start.
+        Start planning your dream trip with AI — free forever, no credit card needed.
       </p>
       <div className="cta-buttons">
         <button onClick={handleStart} className="btn-primary">

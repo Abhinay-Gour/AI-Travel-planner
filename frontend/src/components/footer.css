@@ -38,27 +38,27 @@
   color: var(--gray);
   font-size: 0.82rem;
   line-height: 1.65;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
   max-width: 210px;
 }
 
-.footer-social { display: flex; gap: 10px; }
+.footer-contact {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
 
-.footer-social a {
-  width: 34px; height: 34px;
-  background: rgba(255,255,255,0.04);
-  border: 1px solid var(--border);
-  border-radius: 9px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 0.95rem;
+.footer-contact-link {
+  color: var(--gray);
   text-decoration: none;
-  transition: all 0.2s;
+  font-size: 0.78rem;
+  font-family: 'Inter', sans-serif;
+  transition: color 0.15s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
-.footer-social a:hover {
-  background: var(--indigo3);
-  border-color: var(--indigo);
-  transform: translateY(-2px);
-}
+.footer-contact-link:hover { color: var(--white); }
 
 .footer-col h4 {
   color: var(--white);
