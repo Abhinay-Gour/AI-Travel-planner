@@ -1,163 +1,124 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { searchHotels } from '../services/bookingService';
+import React, { useState } from 'react';
 import './HotelBooking.css';
 
-const STAR_FILTERS = ['All', '5 Star', '4 Star', '3 Star', 'Budget'];
-const AMENITY_FILTERS = ['Pool', 'Spa', 'WiFi', 'Restaurant', 'Gym'];
+const POPULAR_CITIES = ['Goa', 'Manali', 'Jaipur', 'Mumbai', 'Delhi', 'Bangalore', 'Kerala', 'Shimla', 'Ooty', 'Udaipur'];
+
+const HOTEL_SITES = [
+  { name: 'Booking.com', icon: '🏨', color: '#003580', desc: '28M+ listings worldwide', getUrl: (city, ci, co, g) => `https://www.booking.com/searchresults.html?ss=${encodeURIComponent(city)}&checkin=${ci}&checkout=${co}&group_adults=${g}&no_rooms=1` },
+  { name: 'MakeMyTrip', icon: '🏩', color: '#e53e3e', desc: 'Best Indian hotel deals', getUrl: (city, ci, co, g) => `https://www.makemytrip.com/hotels/${city.toLowerCase().replace(/ /g,'-')}-hotels.html` },
+  { name: 'OYO Rooms', icon: '🛏️', color: '#e53e3e', desc: 'Budget & premium stays', getUrl: (city, ci, co, g) => `https://www.oyorooms.com/search/?location=${encodeURIComponent(city)}&checkin=${ci}&checkout=${co}&guests=${g}` },
+  { name: 'Airbnb', icon: '🏠', color: '#ff5a5f', desc: 'Unique stays & homes', getUrl: (city, ci, co, g) => `https://www.airbnb.co.in/s/${encodeURIComponent(city)}/homes?checkin=${ci}&checkout=${co}&adults=${g}` },
+  { name: 'Agoda', icon: '🌏', color: '#5392f9', desc: 'Best Asia hotel prices', getUrl: (city, ci, co, g) => `https://www.agoda.com/search?city=${encodeURIComponent(city)}&checkIn=${ci}&checkOut=${co}&adults=${g}` },
+  { name: 'Goibibo', icon: '🏪', color: '#e53e3e', desc: 'Exclusive Indian deals', getUrl: (city, ci, co, g) => `https://www.goibibo.com/hotels/hotels-in-${city.toLowerCase().replace(/ /g,'-')}/` },
+  { name: 'Treebo Hotels', icon: '🌲', color: '#2f855a', desc: 'Quality budget hotels', getUrl: (city, ci, co, g) => `https://www.treebo.com/hotels-in-${city.toLowerCase().replace(/ /g,'-')}/` },
+  { name: 'Google Hotels', icon: '🔍', color: '#4285f4', desc: 'Compare all prices', getUrl: (city, ci, co, g) => `https://www.google.com/travel/hotels/${encodeURIComponent(city)}?checkin=${ci}&checkout=${co}&guests=${g}` },
+];
 
 const HotelBooking = () => {
-  const [searchCity, setSearchCity] = useState('');
+  const [city, setCity] = useState('');
   const [checkIn, setCheckIn] = useState('');
   const [checkOut, setCheckOut] = useState('');
   const [guests, setGuests] = useState('2');
-  const [starFilter, setStarFilter] = useState('All');
-  const [amenityFilter, setAmenityFilter] = useState('');
-  const [budgetFilter, setBudgetFilter] = useState('All');
-  const [wishlist, setWishlist] = useState([]);
-  const [hotels, setHotels] = useState([]);
-  const [loading, setLoading] = useState(false);
   const [searched, setSearched] = useState(false);
 
-  // Load default hotels on mount
-  useEffect(() => {
-    loadHotels('India');
-  }, []);
-
-  const loadHotels = async (city) => {
-    setLoading(true);
-    try {
-      const data = await searchHotels(city, checkIn, checkOut, parseInt(guests));
-      setHotels(data);
-    } catch {
-      setHotels([]);
-    } finally {
-      setLoading(false);
-      setSearched(true);
-    }
-  };
+  const today = new Date().toISOString().split('T')[0];
 
   const handleSearch = () => {
-    if (!searchCity.trim()) return;
-    loadHotels(searchCity);
+    if (!city.trim()) return;
+    setSearched(true);
   };
 
-  const filtered = useMemo(() => {
-    return hotels.filter(h => {
-      if (starFilter === '5 Star' && h.stars !== 5) return false;
-      if (starFilter === '4 Star' && h.stars !== 4) return false;
-      if (starFilter === '3 Star' && h.stars !== 3) return false;
-      if (starFilter === 'Budget' && h.stars > 2) return false;
-      if (amenityFilter && !h.amenities?.includes(amenityFilter)) return false;
-      if (budgetFilter === 'Under ₹2k' && h.price >= 2000) return false;
-      if (budgetFilter === '₹2k-₹8k' && (h.price < 2000 || h.price > 8000)) return false;
-      if (budgetFilter === '₹8k+' && h.price < 8000) return false;
-      return true;
-    });
-  }, [hotels, starFilter, amenityFilter, budgetFilter]);
-
-  const toggleWishlist = (id) => setWishlist(w => w.includes(id) ? w.filter(x => x !== id) : [...w, id]);
-
-  const handleBook = (hotel) => {
-    const url = hotel.bookingUrl ||
-      `https://www.booking.com/searchresults.html?ss=${encodeURIComponent(hotel.name + ' ' + hotel.city)}&checkin=${checkIn}&checkout=${checkOut}&group_adults=${guests}`;
-    window.open(url, '_blank');
+  const handleRedirect = (site) => {
+    const ci = checkIn || today;
+    const tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate() + 1);
+    const co = checkOut || tomorrow.toISOString().split('T')[0];
+    window.open(site.getUrl(city, ci, co, guests), '_blank');
   };
 
-  const fmt = (n) => `₹${n.toLocaleString('en-IN')}`;
-  const stars = (n) => '★'.repeat(Math.min(n, 5)) + '☆'.repeat(Math.max(0, 5 - n));
+  const nights = checkIn && checkOut
+    ? Math.max(1, Math.ceil((new Date(checkOut) - new Date(checkIn)) / 86400000))
+    : null;
 
   return (
     <section className="hotels-section" id="hotels">
       <div className="section-label">Stay & Relax</div>
-      <h2 className="section-title">Hotel Booking</h2>
-      <p className="section-sub">Real hotels — search, compare & book directly</p>
+      <h2 className="section-title">Hotel Booking 🏨</h2>
+      <p className="section-sub">Search your city — we'll redirect you to the best booking sites</p>
 
+      {/* Search Form */}
       <div className="hotel-search-bar">
         <div className="h-field">
-          <label>🏙️ City / Hotel</label>
-          <input value={searchCity} onChange={e => setSearchCity(e.target.value)}
-            placeholder="Delhi, Goa, Manali..." onKeyDown={e => e.key === 'Enter' && handleSearch()} />
+          <label>🏙️ City / Destination</label>
+          <input value={city} onChange={e => setCity(e.target.value)}
+            placeholder="Goa, Manali, Jaipur..."
+            onKeyDown={e => e.key === 'Enter' && handleSearch()} />
         </div>
         <div className="h-field">
           <label>📅 Check-in</label>
-          <input type="date" value={checkIn} onChange={e => setCheckIn(e.target.value)} min={new Date().toISOString().split('T')[0]} />
+          <input type="date" value={checkIn} onChange={e => setCheckIn(e.target.value)} min={today} />
         </div>
         <div className="h-field">
           <label>📅 Check-out</label>
-          <input type="date" value={checkOut} onChange={e => setCheckOut(e.target.value)} min={checkIn || new Date().toISOString().split('T')[0]} />
+          <input type="date" value={checkOut} onChange={e => setCheckOut(e.target.value)} min={checkIn || today} />
         </div>
         <div className="h-field">
           <label>👥 Guests</label>
           <select value={guests} onChange={e => setGuests(e.target.value)}>
-            {['1','2','3','4','5+'].map(g => <option key={g}>{g} Guest{g !== '1' ? 's' : ''}</option>)}
+            {['1','2','3','4','5','6'].map(g => <option key={g} value={g}>{g} Guest{g !== '1' ? 's' : ''}</option>)}
           </select>
         </div>
-        <button className="h-search-btn" onClick={handleSearch} disabled={loading}>
-          {loading ? '⏳ Searching...' : '🔍 Search Hotels'}
+        <button className="h-search-btn" onClick={handleSearch}>
+          🔍 Find Hotels
         </button>
       </div>
 
-      <div className="hotel-filters">
-        <span className="filter-label">Stars:</span>
-        {STAR_FILTERS.map(f => (
-          <button key={f} className={`filter-chip ${starFilter === f ? 'active' : ''}`} onClick={() => setStarFilter(f)}>{f}</button>
-        ))}
-        <span className="filter-label" style={{marginLeft:8}}>Budget:</span>
-        {['All','Under ₹2k','₹2k-₹8k','₹8k+'].map(f => (
-          <button key={f} className={`filter-chip ${budgetFilter === f ? 'active' : ''}`} onClick={() => setBudgetFilter(f)}>{f}</button>
-        ))}
-        <span className="filter-label" style={{marginLeft:8}}>Amenity:</span>
-        {AMENITY_FILTERS.map(f => (
-          <button key={f} className={`filter-chip ${amenityFilter === f ? 'active' : ''}`} onClick={() => setAmenityFilter(amenityFilter === f ? '' : f)}>{f}</button>
-        ))}
-      </div>
-
-      {loading && (
-        <div style={{textAlign:'center',padding:'40px',color:'rgba(255,255,255,0.5)'}}>
-          <div style={{fontSize:'2rem',marginBottom:8}}>🏨</div>
-          Searching hotels...
+      {/* Popular Cities */}
+      {!searched && (
+        <div className="popular-routes">
+          <p className="popular-label">Popular Destinations:</p>
+          <div className="routes-list">
+            {POPULAR_CITIES.map(c => (
+              <button key={c} className="route-chip" onClick={() => { setCity(c); setSearched(true); }}>
+                {c}
+              </button>
+            ))}
+          </div>
         </div>
       )}
 
-      {!loading && filtered.length === 0 && searched && (
-        <div className="no-hotels">No hotels found. Try different filters or city.</div>
-      )}
+      {/* Booking Sites */}
+      {searched && (
+        <div className="booking-sites-section">
+          <div className="booking-sites-header">
+            <h3>
+              🏨 Hotels in {city}
+              {nights && <span className="booking-date"> · {nights} night{nights > 1 ? 's' : ''} · {guests} guest{guests !== '1' ? 's' : ''}</span>}
+            </h3>
+            <p>Click any site to search & book directly</p>
+          </div>
 
-      {!loading && filtered.length > 0 && (
-        <div className="hotels-grid">
-          {filtered.map(hotel => (
-            <div key={hotel.id} className="hotel-card">
-              <div className="hotel-img-wrap">
-                <img src={hotel.img} alt={hotel.name}
-                  onError={e => { e.target.src = 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=400&h=200&fit=crop'; }} />
-                {hotel.badge && <span className="hotel-badge">{hotel.badge}</span>}
-                <button className="hotel-wishlist" onClick={() => toggleWishlist(hotel.id)}>
-                  {wishlist.includes(hotel.id) ? '❤️' : '🤍'}
-                </button>
-              </div>
-              <div className="hotel-info">
-                <div className="hotel-name">{hotel.name}</div>
-                <div className="hotel-location">📍 {hotel.location}</div>
-                <div className="hotel-stars">{stars(hotel.stars)} {hotel.stars}-Star</div>
-                <div className="hotel-amenities">
-                  {hotel.amenities?.slice(0, 4).map(a => <span key={a} className="amenity-tag">{a}</span>)}
+          <div className="booking-sites-grid">
+            {HOTEL_SITES.map((site, i) => (
+              <button key={i} className="booking-site-card" onClick={() => handleRedirect(site)}>
+                <div className="site-icon" style={{ background: site.color + '20', border: `1px solid ${site.color}40` }}>
+                  {site.icon}
                 </div>
-                <div className="hotel-footer">
-                  <div className="hotel-price">
-                    <div className="amount">{fmt(hotel.price)}</div>
-                    <div className="per">per night</div>
-                  </div>
-                  <div className="hotel-rating">
-                    <span className="rating-score">{hotel.rating}</span>
-                    <span className="rating-count">{hotel.reviews?.toLocaleString()} reviews</span>
-                  </div>
+                <div className="site-info">
+                  <div className="site-name">{site.name}</div>
+                  <div className="site-desc">{site.desc}</div>
                 </div>
-                <button className="book-hotel-btn" onClick={() => handleBook(hotel)}>
-                  Book on {hotel.realBooking ? 'Booking.com' : 'MakeMyTrip'} →
-                </button>
-              </div>
-            </div>
-          ))}
+                <div className="site-arrow">↗</div>
+              </button>
+            ))}
+          </div>
+
+          <div className="booking-note">
+            🔒 You'll be redirected to the official site. Best prices & availability shown there.
+          </div>
+
+          <button className="modify-search-btn" onClick={() => setSearched(false)}>
+            ← Modify Search
+          </button>
         </div>
       )}
     </section>

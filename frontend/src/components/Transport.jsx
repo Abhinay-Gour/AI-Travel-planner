@@ -1,143 +1,160 @@
 import React, { useState } from 'react';
-import { searchFlights, searchTrains, searchBuses } from '../services/bookingService';
 import './Transport.css';
+
+const POPULAR_ROUTES = [
+  { from: 'Delhi', to: 'Mumbai' },
+  { from: 'Mumbai', to: 'Goa' },
+  { from: 'Delhi', to: 'Bangalore' },
+  { from: 'Chennai', to: 'Hyderabad' },
+  { from: 'Kolkata', to: 'Delhi' },
+  { from: 'Mumbai', to: 'Jaipur' },
+];
+
+const BOOKING_SITES = {
+  flight: [
+    { name: 'MakeMyTrip', icon: '✈️', color: '#e53e3e', getUrl: (f, t, d, p) => `https://www.makemytrip.com/flights/domestic/results?tripType=O&itinerary=${f.toUpperCase()}-${t.toUpperCase()}-${d}&paxType=A-${p}_C-0_I-0&cabinClass=E&sTime=${Date.now()}&forwardFlowRequired=true` },
+    { name: 'EaseMyTrip', icon: '🛫', color: '#3182ce', getUrl: (f, t, d, p) => `https://www.easemytrip.com/flights/domestic-flights.aspx?org=${f}&dest=${t}&dd=${d}&ad=${p}&cd=0&id=0&tt=1` },
+    { name: 'Cleartrip', icon: '🌐', color: '#805ad5', getUrl: (f, t, d, p) => `https://www.cleartrip.com/flights/results?adults=${p}&childs=0&infants=0&class=Economy&depart_date=${d}&from=${f}&to=${t}&intl=n` },
+    { name: 'IndiGo', icon: '💙', color: '#2b6cb0', getUrl: (f, t, d, p) => `https://www.goindigo.in/flight-booking.html` },
+    { name: 'Air India', icon: '🇮🇳', color: '#c53030', getUrl: (f, t, d, p) => `https://www.airindia.com/in/en/book/flights.html` },
+    { name: 'Google Flights', icon: '🔍', color: '#4285f4', getUrl: (f, t, d, p) => `https://www.google.com/travel/flights?q=flights+from+${encodeURIComponent(f)}+to+${encodeURIComponent(t)}+on+${d}` },
+  ],
+  train: [
+    { name: 'IRCTC', icon: '🚄', color: '#2f855a', getUrl: (f, t, d) => `https://www.irctc.co.in/nget/train-search` },
+    { name: 'MakeMyTrip Trains', icon: '🚆', color: '#e53e3e', getUrl: (f, t, d) => `https://www.makemytrip.com/railways/` },
+    { name: 'Cleartrip Trains', icon: '🛤️', color: '#805ad5', getUrl: (f, t, d) => `https://www.cleartrip.com/trains/results?from=${encodeURIComponent(f)}&to=${encodeURIComponent(t)}&date=${d}` },
+    { name: 'RailYatri', icon: '📱', color: '#d69e2e', getUrl: (f, t, d) => `https://www.railyatri.in/train-between-stations?from=${encodeURIComponent(f)}&to=${encodeURIComponent(t)}&date=${d}` },
+  ],
+  bus: [
+    { name: 'redBus', icon: '🚌', color: '#e53e3e', getUrl: (f, t, d) => `https://www.redbus.in/bus-tickets/${f.toLowerCase().replace(/ /g,'-')}-to-${t.toLowerCase().replace(/ /g,'-')}?fromCityName=${encodeURIComponent(f)}&toCityName=${encodeURIComponent(t)}&onward=${d}` },
+    { name: 'AbhiBus', icon: '🚍', color: '#2b6cb0', getUrl: (f, t, d) => `https://www.abhibus.com/bus_search/${encodeURIComponent(f)}/${encodeURIComponent(t)}/${d}/S` },
+    { name: 'MakeMyTrip Bus', icon: '🛣️', color: '#e53e3e', getUrl: (f, t, d) => `https://www.makemytrip.com/bus-tickets/${f.toLowerCase().replace(/ /g,'-')}-to-${t.toLowerCase().replace(/ /g,'-')}/` },
+    { name: 'Paytm Travel', icon: '💳', color: '#00b9f1', getUrl: (f, t, d) => `https://travel.paytm.com/bus/${f.toLowerCase().replace(/ /g,'-')}-to-${t.toLowerCase().replace(/ /g,'-')}` },
+  ],
+};
 
 const Transport = () => {
   const [activeTab, setActiveTab] = useState('flight');
-  const [from, setFrom] = useState('Delhi');
-  const [to, setTo] = useState('Mumbai');
+  const [from, setFrom] = useState('');
+  const [to, setTo] = useState('');
   const [date, setDate] = useState('');
   const [passengers, setPassengers] = useState('1');
-  const [results, setResults] = useState(null);
-  const [loading, setLoading] = useState(false);
   const [searched, setSearched] = useState(false);
 
-  const handleSearch = async () => {
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  const minDate = tomorrow.toISOString().split('T')[0];
+
+  const handleSearch = () => {
     if (!from.trim() || !to.trim()) return;
-    setLoading(true);
     setSearched(true);
-    setResults(null);
-
-    try {
-      let data;
-      const travelDate = date || new Date(Date.now() + 7 * 86400000).toISOString().split('T')[0];
-
-      if (activeTab === 'flight') data = await searchFlights(from, to, travelDate, parseInt(passengers));
-      else if (activeTab === 'train') data = await searchTrains(from, to, travelDate);
-      else data = await searchBuses(from, to, travelDate);
-
-      setResults(data);
-    } catch {
-      setResults([]);
-    } finally {
-      setLoading(false);
-    }
   };
 
-  const handleBook = (item) => {
-    if (item.bookingUrl) {
-      window.open(item.bookingUrl, '_blank');
-    }
+  const handleRedirect = (site) => {
+    const travelDate = date || minDate;
+    const url = site.getUrl(from, to, travelDate, passengers);
+    window.open(url, '_blank');
   };
 
-  const tabIcon = activeTab === 'flight' ? '✈️' : activeTab === 'train' ? '🚄' : '🚌';
+  const setRoute = (route) => {
+    setFrom(route.from);
+    setTo(route.to);
+    setSearched(false);
+  };
+
+  const sites = BOOKING_SITES[activeTab];
 
   return (
     <section className="transport-section" id="transport">
       <div className="section-label">Book Transport</div>
-      <h2 className="section-title">Flights, Trains & Buses</h2>
-      <p className="section-sub">Real-time search — book directly from here</p>
+      <h2 className="section-title">Flights, Trains & Buses ✈️</h2>
+      <p className="section-sub">Fill your details — we'll take you directly to the best booking sites</p>
 
+      {/* Tabs */}
       <div className="transport-tabs">
-        {[{ id:'flight', label:'Flights', icon:'✈️' }, { id:'train', label:'Trains', icon:'🚄' }, { id:'bus', label:'Buses', icon:'🚌' }].map(tab => (
+        {[{ id: 'flight', label: 'Flights', icon: '✈️' }, { id: 'train', label: 'Trains', icon: '🚄' }, { id: 'bus', label: 'Buses', icon: '🚌' }].map(tab => (
           <button key={tab.id} className={`transport-tab ${activeTab === tab.id ? 'active' : ''}`}
-            onClick={() => { setActiveTab(tab.id); setResults(null); setSearched(false); }}>
+            onClick={() => { setActiveTab(tab.id); setSearched(false); }}>
             {tab.icon} {tab.label}
           </button>
         ))}
       </div>
 
+      {/* Search Form */}
       <div className="transport-search">
         <div className="t-field">
           <label>From</label>
           <input value={from} onChange={e => setFrom(e.target.value)} placeholder="Delhi, Mumbai..." />
         </div>
+        <button className="t-swap-btn" onClick={() => { const tmp = from; setFrom(to); setTo(tmp); }}>⇄</button>
         <div className="t-field">
           <label>To</label>
           <input value={to} onChange={e => setTo(e.target.value)} placeholder="Goa, Bangalore..." />
         </div>
         <div className="t-field">
           <label>Date</label>
-          <input type="date" value={date} onChange={e => setDate(e.target.value)} min={new Date().toISOString().split('T')[0]} />
+          <input type="date" value={date} onChange={e => setDate(e.target.value)} min={minDate} />
         </div>
-        <div className="t-field">
-          <label>Passengers</label>
-          <select value={passengers} onChange={e => setPassengers(e.target.value)}>
-            {['1','2','3','4','5','6'].map(n => <option key={n} value={n}>{n} {n==='1'?'Adult':'Adults'}</option>)}
-          </select>
-        </div>
-        <button className="t-search-btn" onClick={handleSearch} disabled={loading}>
-          {loading ? '⏳ Searching...' : '🔍 Search'}
+        {activeTab === 'flight' && (
+          <div className="t-field">
+            <label>Passengers</label>
+            <select value={passengers} onChange={e => setPassengers(e.target.value)}>
+              {['1','2','3','4','5','6'].map(n => <option key={n} value={n}>{n} {n === '1' ? 'Adult' : 'Adults'}</option>)}
+            </select>
+          </div>
+        )}
+        <button className="t-search-btn" onClick={handleSearch}>
+          🔍 Find Options
         </button>
       </div>
 
-      {loading && (
-        <div style={{textAlign:'center',padding:'32px',color:'rgba(255,255,255,0.6)'}}>
-          <div style={{fontSize:'2rem',marginBottom:8}}>⏳</div>
-          Searching real-time {activeTab} options...
-        </div>
-      )}
-
-      {!loading && searched && results?.length === 0 && (
-        <div style={{textAlign:'center',padding:'32px',color:'rgba(255,255,255,0.5)'}}>
-          No results found. Try different cities.
-        </div>
-      )}
-
-      {!loading && results && results.length > 0 && (
-        <div className="transport-results">
-          {results.map((item, i) => (
-            <div key={item.id || i} className={`transport-card ${item.best ? 'best-value' : ''}`}>
-              <div className="carrier-logo">{item.emoji}</div>
-              <div className="carrier-info">
-                <div className="carrier-name">{item.carrierName || item.carrier}</div>
-                <div className="carrier-class">{item.class} {item.trainNo ? `· #${item.trainNo}` : ''}</div>
-                {item.best && <span className="best-badge">Best Value</span>}
-                {item.realBooking && <span className="best-badge" style={{background:'#10b981',marginLeft:4}}>Live</span>}
-              </div>
-              <div className="route-info">
-                <div className="route-time">
-                  <div className="time">{item.time}</div>
-                  <div className="city">{item.from || from}</div>
-                </div>
-                <div className="route-line">
-                  <div className="route-duration">{item.duration}</div>
-                  <div className="route-bar" />
-                  <div className="route-stops">{item.stops}</div>
-                </div>
-                <div className="route-time">
-                  <div className="time">{item.arr}</div>
-                  <div className="city">{item.to || to}</div>
-                </div>
-              </div>
-              <div className="transport-price">
-                <div className="price-amount">₹{(item.price * parseInt(passengers)).toLocaleString('en-IN')}</div>
-                <div className="price-per">{passengers > 1 ? `${passengers} passengers` : 'per person'}</div>
-                <button className="book-btn" onClick={() => handleBook(item)}>
-                  Book Now →
-                </button>
-              </div>
-            </div>
-          ))}
-          <p className="transport-note">
-            🔒 Clicking "Book Now" redirects to official booking site. Prices may vary.
-          </p>
-        </div>
-      )}
-
+      {/* Popular Routes */}
       {!searched && (
-        <div style={{textAlign:'center',padding:'24px',color:'rgba(255,255,255,0.35)',fontSize:'0.9rem'}}>
-          Search flights, trains or buses between any Indian cities
+        <div className="popular-routes">
+          <p className="popular-label">Popular Routes:</p>
+          <div className="routes-list">
+            {POPULAR_ROUTES.map((r, i) => (
+              <button key={i} className="route-chip" onClick={() => setRoute(r)}>
+                {r.from} → {r.to}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Booking Sites */}
+      {searched && (
+        <div className="booking-sites-section">
+          <div className="booking-sites-header">
+            <h3>
+              {activeTab === 'flight' ? '✈️' : activeTab === 'train' ? '🚄' : '🚌'} {from} → {to}
+              {date && <span className="booking-date"> · {new Date(date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</span>}
+            </h3>
+            <p>Click any site to search & book directly</p>
+          </div>
+
+          <div className="booking-sites-grid">
+            {sites.map((site, i) => (
+              <button key={i} className="booking-site-card" onClick={() => handleRedirect(site)}>
+                <div className="site-icon" style={{ background: site.color + '20', border: `1px solid ${site.color}40` }}>
+                  {site.icon}
+                </div>
+                <div className="site-info">
+                  <div className="site-name">{site.name}</div>
+                  <div className="site-action">Search & Book →</div>
+                </div>
+                <div className="site-arrow">↗</div>
+              </button>
+            ))}
+          </div>
+
+          <div className="booking-note">
+            🔒 You'll be redirected to the official booking site. Prices & availability shown there.
+          </div>
+
+          <button className="modify-search-btn" onClick={() => setSearched(false)}>
+            ← Modify Search
+          </button>
         </div>
       )}
     </section>
