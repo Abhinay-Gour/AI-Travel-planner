@@ -157,6 +157,8 @@ const Navbar = () => {
         <ul className="nav-links">
           <li><Link to="/" className={isActive('/') ? 'nav-active' : ''}>Home</Link></li>
           <li><Link to="/destinations" className={isActive('/destinations') ? 'nav-active' : ''}>Explore</Link></li>
+          <li><Link to="/transport" className={isActive('/transport') ? 'nav-active' : ''}>Transport</Link></li>
+          <li><Link to="/hotels" className={isActive('/hotels') ? 'nav-active' : ''}>Hotels</Link></li>
           <li><Link to="/packing" className={isActive('/packing') ? 'nav-active' : ''}>Packing</Link></li>
           <li><Link to="/mood-quiz" className={isActive('/mood-quiz') ? 'nav-active' : ''}>Quiz</Link></li>
           <li><Link to="/wishlist" className={isActive('/wishlist') ? 'nav-active' : ''}>Wishlist</Link></li>
@@ -297,7 +299,7 @@ const Navbar = () => {
                 </div>
               ) : authMode === 'forgot' ? (
                 /* ── FORGOT PASSWORD ── */
-                <div>
+                <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
                   {forgotSent ? (
                     <div className="auth-sent">
                       <div style={{ fontSize: '2.5rem', marginBottom: 12 }}>📧</div>
@@ -326,6 +328,17 @@ const Navbar = () => {
                       </button>
                     </form>
                   )}
+                  {/* Always visible back button */}
+                  <div className="auth-footer" style={{ marginTop: 'auto' }}>
+                    <p>
+                      <button
+                        onClick={() => { setAuthMode('login'); setAuthError(''); setForgotSent(false); setForgotEmail(''); }}
+                        className="link-btn"
+                      >
+                        ← Back to Sign In
+                      </button>
+                    </p>
+                  </div>
                 </div>
               ) : (
                 /* ── LOGIN / SIGNUP FORM ── */
@@ -445,8 +458,8 @@ const Navbar = () => {
                 </form>
               )}
 
-              {/* Footer */}
-              {!authSuccess && (
+              {/* Footer — only for login/signup, not forgot */}
+              {!authSuccess && authMode !== 'forgot' && (
                 <div className="auth-footer">
                   {authMode === 'login' ? (
                     <>
@@ -457,10 +470,8 @@ const Navbar = () => {
                         </button>
                       </p>
                     </>
-                  ) : authMode === 'signup' ? (
-                    <p>Already have an account? <button onClick={() => { setAuthMode('login'); setAuthError(''); }} className="link-btn">Sign in →</button></p>
                   ) : (
-                    <p><button onClick={() => { setAuthMode('login'); setAuthError(''); }} className="link-btn">← Back to Sign In</button></p>
+                    <p>Already have an account? <button onClick={() => { setAuthMode('login'); setAuthError(''); }} className="link-btn">Sign in →</button></p>
                   )}
                 </div>
               )}
