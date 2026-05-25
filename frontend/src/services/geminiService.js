@@ -1,14 +1,9 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
 const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
-
-if (!API_KEY) {
-  console.error('Gemini API key not found. Please add VITE_GEMINI_API_KEY to your .env file');
-}
-
 const genAI = new GoogleGenerativeAI(API_KEY);
 
-// Curated static Unsplash image IDs — always work, no API needed
+// Curated static Unsplash image IDs
 const DEST_IMAGES = {
   paris: 'photo-1502602898657-3e91760cbb34',
   tokyo: 'photo-1540959733332-eab4deabeeaf',
@@ -24,10 +19,19 @@ const DEST_IMAGES = {
   singapore: 'photo-1525625293386-3f8f99389edd',
   bangkok: 'photo-1508009603885-50cf7c579365',
   maldives: 'photo-1514282401047-d79a71a590e8',
+  istanbul: 'photo-1524231757912-21f4fe3a7200',
+  barcelona: 'photo-1539037116277-4db20889f2d4',
+  kyoto: 'photo-1493976040374-85c8e12f0c0e',
+  mumbai: 'photo-1570168007204-dfb528c6958f',
+  delhi: 'photo-1587474260584-136574528ed5',
+  agra: 'photo-1564507592333-c60657eea523',
+  varanasi: 'photo-1561361058-c24e01238a46',
+  rishikesh: 'photo-1506905925346-21bda4d32df4',
+  shimla: 'photo-1626621341517-bbf3d9990a23',
   default: 'photo-1469474968028-56623f02e42e',
 };
 
-const getDestImage = (destination = '', w = 800, h = 600) => {
+export const getDestImage = (destination = '', w = 800, h = 500) => {
   const d = destination.toLowerCase();
   for (const [key, id] of Object.entries(DEST_IMAGES)) {
     if (key !== 'default' && d.includes(key)) {
@@ -39,7 +43,7 @@ const getDestImage = (destination = '', w = 800, h = 600) => {
 
 export const generateTripPlan = async (destination, startDate, endDate, days, preferences = '') => {
   try {
-    if (!API_KEY) throw new Error('API key not configured. Please check your .env file.');
+    if (!API_KEY) throw new Error('Gemini API key missing');
 
     let model;
     try {
@@ -48,365 +52,254 @@ export const generateTripPlan = async (destination, startDate, endDate, days, pr
       model = genAI.getGenerativeModel({ model: 'gemini-pro' });
     }
 
-    const prompt = `Create a detailed ${days}-day travel itinerary for ${destination} from ${startDate} to ${endDate}.
+    const prompt = `You are an expert travel planner. Create a detailed ${days}-day trip itinerary for ${destination}.
 
-IMPORTANT: Include REAL, FAMOUS, and SPECIFIC locations with detailed descriptions.
+IMPORTANT RULES:
+- Use ONLY real, existing places with actual names
+- Include airport name, real hotel areas, real restaurants, real attractions
+- All costs in Indian Rupees (₹)
+- Times should be realistic (not too rushed)
+- Include breakfast, lunch, dinner for each day
+- Day 1 starts with airport arrival
+- Last day ends with airport departure
 
-Destination: ${destination}
-Duration: ${days} days
-Dates: ${startDate} to ${endDate}
+Return ONLY valid JSON (no markdown, no extra text):
 
-Overview: [Brief 2-3 sentence overview]
+{
+  "destination": "${destination}",
+  "duration": "${days} days",
+  "dates": "${startDate} to ${endDate}",
+  "overview": "2-3 sentences about why ${destination} is amazing to visit",
+  "highlights": [
+    "Real famous place 1 - brief description",
+    "Real famous place 2 - brief description",
+    "Real famous place 3 - brief description",
+    "Real famous place 4 - brief description"
+  ],
+  "dailyItinerary": [
+    {
+      "day": 1,
+      "date": "${startDate}",
+      "title": "Arrival & First Exploration",
+      "activities": [
+        {
+          "time": "10:00 AM",
+          "activity": "Arrive at [REAL AIRPORT NAME]",
+          "description": "Land at airport, clear immigration, collect baggage. Take [metro/taxi/bus] to hotel area.",
+          "location": "[Real airport name], [City]",
+          "duration": "2 hours",
+          "cost": "₹800 (taxi to hotel)",
+          "tips": "Book airport taxi in advance to avoid overcharging"
+        },
+        {
+          "time": "12:30 PM",
+          "activity": "Hotel Check-in & Freshen Up",
+          "description": "Check into hotel in [REAL NEIGHBORHOOD]. Rest and freshen up after journey.",
+          "location": "[Real neighborhood/area name]",
+          "duration": "1 hour",
+          "cost": "₹3000-8000/night"
+        },
+        {
+          "time": "02:00 PM",
+          "activity": "Lunch at [REAL LOCAL RESTAURANT/AREA]",
+          "description": "Try authentic local cuisine. Must try: [specific local dish names]",
+          "location": "[Real restaurant area or market name]",
+          "duration": "1 hour",
+          "cost": "₹400-800 per person"
+        },
+        {
+          "time": "03:30 PM",
+          "activity": "Visit [REAL FAMOUS LANDMARK]",
+          "description": "[What makes this place special, history, what to see there]",
+          "location": "[Real address or area]",
+          "duration": "2-3 hours",
+          "cost": "₹500-1500 entry",
+          "tips": "[Specific tip for this place]"
+        },
+        {
+          "time": "07:00 PM",
+          "activity": "Dinner at [REAL RESTAURANT AREA]",
+          "description": "Evening dinner with local specialties. [Specific food recommendations]",
+          "location": "[Real area name]",
+          "duration": "1.5 hours",
+          "cost": "₹600-1200 per person"
+        }
+      ],
+      "meals": {
+        "breakfast": "Hotel breakfast or [specific local breakfast place]",
+        "lunch": "[Real restaurant or food area name]",
+        "dinner": "[Real restaurant area or specific restaurant]"
+      },
+      "accommodation": "Stay in [real neighborhood] - good location for sightseeing",
+      "dailyCost": "₹5000-8000 per person"
+    }
+  ],
+  "budgetEstimate": {
+    "accommodation": "₹2000-8000 per night",
+    "food": "₹1500-3000 per day",
+    "activities": "₹5000-15000 total",
+    "transportation": "₹3000-8000 total",
+    "total": "₹${Math.round(days * 4000)}-₹${Math.round(days * 12000)} for entire trip"
+  },
+  "travelTips": [
+    "Specific tip about ${destination} transport",
+    "Cultural tip specific to ${destination}",
+    "Best time to visit specific attractions",
+    "Money/payment tip for ${destination}",
+    "Safety tip for ${destination}"
+  ],
+  "packingList": [
+    "Weather-appropriate clothing for ${destination}",
+    "Comfortable walking shoes",
+    "Camera and power bank",
+    "Travel documents and copies",
+    "Basic medicines and first aid"
+  ],
+  "bestTimeToVisit": "Specific months and why for ${destination}",
+  "localCurrency": "Currency name and exchange rate from INR",
+  "language": "Local language and useful phrases",
+  "emergencyNumbers": "Police: [number], Ambulance: [number], Tourist helpline: [number]"
+}
 
-Highlights:
-- [Real famous landmark 1]
-- [Real famous landmark 2]
-- [Real famous landmark 3]
-- [Real famous landmark 4]
+Generate ALL ${days} days in dailyItinerary array with REAL places for ${destination}.
+Additional preferences: ${preferences || 'Standard comfortable travel'}`;
 
-Daily Itinerary:
-
-Day 1 (${startDate}) - Arrival & City Center Exploration
-- 09:00 AM: [Activity] ($cost)
-  Location: [Real address]
-  Why Visit: [Description]
-- 02:00 PM: [Activity] ($cost)
-- 07:00 PM: Dinner at [Restaurant area] ($cost)
-Meals: [breakfast, lunch, dinner]
-Accommodation: [Hotel area]
-
-[Continue for all ${days} days]
-
-Budget Estimate:
-- Accommodation: $80-150 per night
-- Food: $40-80 per day
-- Activities: $200-400 total
-- Transportation: $100-200 total
-- Total: $800-1500 for entire trip
-
-Travel Tips:
-- [Tip 1]
-- [Tip 2]
-- [Tip 3]
-
-Packing List:
-- [Item 1]
-- [Item 2]
-
-Best Time to Visit: [Info]
-Local Currency: [Currency]
-Language: [Language]
-
-Additional preferences: ${preferences || 'Standard travel experience with authentic local experiences'}`;
-
-    console.log('Generating trip plan for:', destination);
     const result = await model.generateContent(prompt);
     const text = result.response.text();
-    console.log('AI Response received successfully');
 
-    const parsedData = parseTextResponseWithLocations(text, destination, startDate, endDate, days);
-    console.log('✅ Trip plan generated successfully!');
-    return parsedData;
+    // Parse JSON from response
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) throw new Error('No JSON in response');
+
+    const parsed = JSON.parse(jsonMatch[0]);
+
+    // Add images
+    const img = getDestImage(destination);
+    parsed.heroImage = { primary: img, thumbnail: img, fallback: img };
+
+    console.log('✅ Trip plan generated:', destination);
+    return parsed;
 
   } catch (error) {
-    console.error('Error generating trip plan:', error);
-    return createEnhancedFallbackResponse(destination, startDate, endDate, days);
+    console.error('Trip generation error:', error);
+    return createFallbackResponse(destination, startDate, endDate, days);
   }
 };
 
-const parseTextResponseWithLocations = (text, destination, startDate, endDate, days) => {
-  try {
-    const overviewMatch = text.match(/Overview:\s*([^\n]+(?:\n[^\n]*)*?)(?=\n\n|Highlights:|$)/i);
-    const highlightsMatch = text.match(/Highlights:\s*([\s\S]*?)(?=\n\nDaily Itinerary:|Daily Itinerary:|Budget Estimate:|$)/i);
-    const tipsMatch = text.match(/Travel Tips:\s*([\s\S]*?)(?=\n\nPacking List:|Packing List:|$)/i);
-    const dailyMatch = text.match(/Daily Itinerary:\s*([\s\S]*?)(?=\n\nBudget Estimate:|Budget Estimate:|$)/i);
+const createFallbackResponse = (destination, startDate, endDate, days) => {
+  const img = getDestImage(destination);
+  const daysNum = parseInt(days) || 3;
 
-    const highlights = highlightsMatch
-      ? highlightsMatch[1].split('\n').filter(l => l.trim().startsWith('-')).map(l => l.replace(/^-\s*/, '').trim()).filter(Boolean)
-      : [];
-
-    const travelTips = tipsMatch
-      ? tipsMatch[1].split('\n').filter(l => l.trim().startsWith('-')).map(l => l.replace(/^-\s*/, '').trim()).filter(Boolean)
-      : [];
-
-    const dailyItinerary = parseDailyItineraryWithLocations(dailyMatch ? dailyMatch[1] : '', days, startDate, destination);
-    const img = getDestImage(destination, 800, 400);
+  const dailyItinerary = Array.from({ length: daysNum }, (_, i) => {
+    const date = new Date(startDate);
+    date.setDate(date.getDate() + i);
+    const dateStr = date.toISOString().split('T')[0];
 
     return {
-      destination,
-      duration: `${days} days`,
-      dates: `${startDate} to ${endDate}`,
-      overview: overviewMatch ? overviewMatch[1].trim() : `Exciting ${days}-day adventure in ${destination}.`,
-      highlights: highlights.length > 0 ? highlights : getDefaultHighlights(destination),
-      dailyItinerary,
-      budgetEstimate: {
-        accommodation: '$80 - $150 per night',
-        food: '$40 - $80 per day',
-        activities: '$200 - $400 total',
-        transportation: '$100 - $200 total',
-        total: `$${400 + days * 60} - $${600 + days * 120} for entire trip`
+      day: i + 1,
+      date: dateStr,
+      title: i === 0 ? 'Arrival & First Exploration'
+        : i === daysNum - 1 ? 'Final Day & Departure'
+        : `Day ${i + 1} — Exploring ${destination}`,
+      activities: [
+        {
+          time: '09:00 AM',
+          activity: i === 0 ? `Arrive at ${destination} Airport` : `Morning at ${destination}`,
+          description: i === 0
+            ? `Land at airport, take taxi/metro to hotel in city center`
+            : `Start your day exploring the best of ${destination}`,
+          location: i === 0 ? `${destination} International Airport` : `${destination} City Center`,
+          duration: '2 hours',
+          cost: i === 0 ? '₹800 (taxi)' : '₹0',
+        },
+        {
+          time: '12:00 PM',
+          activity: `Lunch — Local ${destination} Cuisine`,
+          description: `Try authentic local food and specialties of ${destination}`,
+          location: `Local restaurant in ${destination}`,
+          duration: '1 hour',
+          cost: '₹500-800',
+        },
+        {
+          time: '02:00 PM',
+          activity: `Visit Famous Attractions of ${destination}`,
+          description: `Explore the most iconic landmarks and attractions`,
+          location: `${destination} Tourist Area`,
+          duration: '3 hours',
+          cost: '₹500-1500',
+        },
+        {
+          time: '07:00 PM',
+          activity: `Dinner & Evening in ${destination}`,
+          description: `Enjoy local dinner and evening atmosphere`,
+          location: `${destination} Restaurant District`,
+          duration: '2 hours',
+          cost: '₹600-1200',
+        },
+      ],
+      meals: {
+        breakfast: 'Hotel breakfast',
+        lunch: `Local ${destination} restaurant`,
+        dinner: `${destination} dining area`,
       },
-      travelTips: travelTips.length > 0 ? travelTips : getDefaultTips(destination),
-      packingList: getDestinationPackingList(),
-      bestTimeToVisit: `Check ${destination} weather patterns for optimal timing`,
-      localCurrency: getCurrencyInfo(destination),
-      language: getLanguageInfo(destination),
-      heroImage: { primary: img, thumbnail: img, fallback: img },
-      highlightImages: (highlights.length > 0 ? highlights : getDefaultHighlights(destination)).reduce((acc, _, i) => {
-        acc[i] = { primary: img, thumbnail: img, fallback: img };
-        return acc;
-      }, {}),
-      rawResponse: text
+      accommodation: `Hotel in ${destination} city center`,
+      dailyCost: '₹4000-8000',
     };
-  } catch (parseError) {
-    console.error('Error parsing response:', parseError);
-    return createEnhancedFallbackResponse(destination, startDate, endDate, days);
-  }
-};
+  });
 
-const parseDailyItineraryWithLocations = (dailyText, days, startDate, destination) => {
-  const itinerary = [];
-  const start = new Date(startDate);
-  const dayMatches = dailyText.match(/Day \d+[\s\S]*?(?=Day \d+|$)/gi) || [];
-
-  for (let i = 0; i < days; i++) {
-    const currentDate = new Date(start);
-    currentDate.setDate(start.getDate() + i);
-    const dateStr = currentDate.toISOString().split('T')[0];
-    const dayData = dayMatches[i] ? parseSingleDay(dayMatches[i], i + 1, dateStr, destination) : null;
-    itinerary.push(dayData || generateEnhancedFallbackDay(i + 1, dateStr, destination, days));
-  }
-  return itinerary;
-};
-
-const parseSingleDay = (dayText, dayNumber, date, destination) => {
-  try {
-    const titleMatch = dayText.match(/Day \d+[^\n]*?-\s*([^\n]+)/i);
-    const timeMatches = dayText.match(/\d{1,2}:\d{2}\s*[AP]M[\s\S]*?(?=\d{1,2}:\d{2}\s*[AP]M|Meals:|Accommodation:|$)/gi) || [];
-    const img = getDestImage(destination, 800, 600);
-
-    const activities = timeMatches.map(block => {
-      const timeMatch = block.match(/(\d{1,2}:\d{2}\s*[AP]M)/);
-      const activityMatch = block.match(/[AP]M[:\s]*([^\n]+)/);
-      const locationMatch = block.match(/Location:\s*([^\n]+)/i);
-      const whyMatch = block.match(/Why Visit:\s*([^\n]+)/i);
-      const costMatch = block.match(/\$(\d+(?:-\d+)?)/);
-      if (!timeMatch || !activityMatch) return null;
-      return {
-        time: timeMatch[1],
-        activity: activityMatch[1].trim(),
-        location: locationMatch ? locationMatch[1].trim() : 'City center',
-        description: whyMatch ? whyMatch[1].trim() : 'Exciting local experience',
-        duration: '2-3 hours',
-        cost: costMatch ? `$${costMatch[1]}` : '$30-50',
-        image: img,
-        realImage: { primary: img, thumbnail: img, fallback: img }
-      };
-    }).filter(Boolean);
-
-    return {
-      day: dayNumber, date,
-      title: titleMatch ? titleMatch[1].trim() : `Day ${dayNumber} Adventures`,
-      activities,
-      meals: { breakfast: 'Local café or hotel breakfast', lunch: 'Traditional restaurant', dinner: 'Recommended dining experience' },
-      accommodation: 'Comfortable hotel in prime location'
-    };
-  } catch {
-    return null;
-  }
-};
-
-const getDefaultHighlights = (destination) => {
-  const city = destination.toLowerCase();
-  if (city.includes('paris')) return ['Eiffel Tower - Iconic iron lattice tower', "Louvre Museum - World's largest art museum", 'Notre-Dame Cathedral - Gothic masterpiece', 'Champs-Élysées - Famous shopping avenue'];
-  if (city.includes('tokyo')) return ['Senso-ji Temple - Ancient Buddhist temple', "Shibuya Crossing - World's busiest crossing", 'Tokyo Skytree - Tallest structure in Japan', 'Tsukiji Outer Market - Fresh seafood paradise'];
-  if (city.includes('rome')) return ['Colosseum - Ancient gladiator arena', "Vatican City - St. Peter's Basilica", 'Trevi Fountain - Baroque masterpiece', 'Roman Forum - Ancient ruins'];
-  if (city.includes('london')) return ['Big Ben & Houses of Parliament', 'Tower Bridge - Victorian bascule bridge', 'British Museum - World-class artifacts', 'Buckingham Palace - Royal residence'];
-  if (city.includes('new york')) return ['Statue of Liberty - Symbol of freedom', 'Central Park - Urban oasis in Manhattan', 'Times Square - Bright lights & Broadway', 'Empire State Building - Art Deco skyscraper'];
-  if (city.includes('dubai')) return ['Burj Khalifa - World\'s tallest building', 'Dubai Mall - Largest shopping mall', 'Palm Jumeirah - Iconic artificial island', 'Dubai Creek - Historic waterway'];
-  if (city.includes('goa')) return ['Baga Beach - Famous party beach', 'Old Goa Churches - UNESCO heritage', 'Dudhsagar Falls - Stunning waterfall', 'Anjuna Flea Market - Vibrant bazaar'];
-  return [
-    `Explore the main attractions of ${destination}`,
-    'Experience authentic local cuisine and culture',
-    'Visit historical landmarks and museums',
-    'Discover scenic viewpoints and photo opportunities'
-  ];
-};
-
-const getDefaultTips = (destination) => [
-  `Book accommodations in ${destination} in advance for better rates`,
-  'Try local transportation to experience the city like a local',
-  'Learn basic local phrases to enhance your cultural experience',
-  'Keep copies of important documents in separate locations',
-  'Research local customs and etiquette before visiting'
-];
-
-const getDestinationPackingList = () => [
-  'Comfortable walking shoes for sightseeing',
-  'Weather-appropriate clothing layers',
-  'Camera and portable chargers',
-  'Travel documents and emergency contacts',
-  'Basic first aid kit and personal medications',
-  'Universal power adapter',
-  'Guidebook or offline maps app'
-];
-
-const getCurrencyInfo = (destination) => {
-  const city = destination.toLowerCase();
-  if (city.includes('paris') || city.includes('france')) return 'Euro (EUR)';
-  if (city.includes('tokyo') || city.includes('japan')) return 'Japanese Yen (JPY)';
-  if (city.includes('london') || city.includes('uk')) return 'British Pound (GBP)';
-  if (city.includes('new york') || city.includes('usa')) return 'US Dollar (USD)';
-  if (city.includes('dubai') || city.includes('uae')) return 'UAE Dirham (AED)';
-  if (city.includes('india') || city.includes('delhi') || city.includes('mumbai') || city.includes('goa') || city.includes('jaipur')) return 'Indian Rupee (INR)';
-  return 'Check local currency and exchange rates';
-};
-
-const getLanguageInfo = (destination) => {
-  const city = destination.toLowerCase();
-  if (city.includes('paris') || city.includes('france')) return 'French (English widely spoken in tourist areas)';
-  if (city.includes('tokyo') || city.includes('japan')) return 'Japanese (English in major tourist areas)';
-  if (city.includes('london') || city.includes('uk')) return 'English';
-  if (city.includes('rome') || city.includes('italy')) return 'Italian (English in tourist areas)';
-  if (city.includes('dubai') || city.includes('uae')) return 'Arabic (English widely spoken)';
-  return 'Check local language and download translation apps';
-};
-
-const createEnhancedFallbackResponse = (destination, startDate, endDate, days) => {
-  console.log('Creating fallback response for:', destination);
-  const img = getDestImage(destination, 800, 400);
   return {
     destination,
     duration: `${days} days`,
     dates: `${startDate} to ${endDate}`,
-    overview: `Exciting ${days}-day adventure in ${destination} with carefully planned activities, authentic local experiences, and cultural immersion.`,
-    highlights: getDefaultHighlights(destination),
-    dailyItinerary: generateEnhancedFallbackItinerary(days, startDate, destination),
-    budgetEstimate: {
-      accommodation: '$80 - $150 per night',
-      food: '$40 - $80 per day',
-      activities: '$200 - $400 total',
-      transportation: '$100 - $200 total',
-      total: `$${400 + days * 60} - $${600 + days * 120} for entire trip`
-    },
-    travelTips: getDefaultTips(destination),
-    packingList: getDestinationPackingList(),
-    bestTimeToVisit: `Research ${destination} weather patterns for optimal timing`,
-    localCurrency: getCurrencyInfo(destination),
-    language: getLanguageInfo(destination),
-    heroImage: { primary: img, thumbnail: img, fallback: img },
-    highlightImages: getDefaultHighlights(destination).reduce((acc, _, i) => {
-      acc[i] = { primary: img, thumbnail: img, fallback: img };
-      return acc;
-    }, {}),
-    generatedBy: 'AI Travel Planner Fallback System'
-  };
-};
-
-const generateEnhancedFallbackItinerary = (days, startDate, destination) => {
-  const start = new Date(startDate);
-  const locationData = getDestinationLocationData(destination);
-  return Array.from({ length: days }, (_, i) => {
-    const d = new Date(start);
-    d.setDate(start.getDate() + i);
-    return generateEnhancedFallbackDay(i + 1, d.toISOString().split('T')[0], destination, days, locationData);
-  });
-};
-
-const generateEnhancedFallbackDay = (dayNumber, date, destination, totalDays, locationData = null) => {
-  if (!locationData) locationData = getDestinationLocationData(destination);
-  const dayTitle = dayNumber === 1 ? 'Arrival & City Exploration'
-    : dayNumber === totalDays ? 'Final Day & Departure'
-    : `${destination} Discovery Day ${dayNumber}`;
-  const locs = locationData.activities.slice((dayNumber - 1) * 3, dayNumber * 3);
-  const img = getDestImage(destination, 800, 600);
-
-  return {
-    day: dayNumber, date, title: dayTitle,
-    activities: [
-      { time: '09:00 AM', activity: locs[0]?.name || `Explore ${destination} city center`, description: locs[0]?.description || 'Start your day with exciting exploration', location: locs[0]?.location || 'City center area', duration: '2-3 hours', cost: '$30-50', image: img, realImage: { primary: img, thumbnail: img, fallback: img } },
-      { time: '02:00 PM', activity: locs[1]?.name || `Visit ${destination} attractions`, description: locs[1]?.description || 'Afternoon cultural and sightseeing activities', location: locs[1]?.location || 'Main tourist area', duration: '3-4 hours', cost: '$40-60', image: img, realImage: { primary: img, thumbnail: img, fallback: img } },
-      { time: '07:00 PM', activity: locs[2]?.name || `${destination} evening experience`, description: locs[2]?.description || 'Evening relaxation and local experiences', location: locs[2]?.location || 'Entertainment district', duration: '2-3 hours', cost: '$35-55', image: img, realImage: { primary: img, thumbnail: img, fallback: img } }
+    overview: `${destination} is an amazing destination with rich culture, stunning landscapes, and unforgettable experiences. This ${days}-day itinerary covers the best of what ${destination} has to offer.`,
+    highlights: [
+      `Explore the iconic landmarks of ${destination}`,
+      `Experience authentic local cuisine and culture`,
+      `Visit historical sites and museums`,
+      `Discover scenic viewpoints and natural beauty`,
     ],
-    meals: {
-      breakfast: `Local café or hotel breakfast in ${destination}`,
-      lunch: `Traditional ${destination} restaurant with local specialties`,
-      dinner: `Recommended ${destination} dining experience`
+    dailyItinerary,
+    budgetEstimate: {
+      accommodation: '₹2000-8000 per night',
+      food: '₹1500-3000 per day',
+      activities: '₹5000-15000 total',
+      transportation: '₹3000-8000 total',
+      total: `₹${Math.round(daysNum * 4000)}-₹${Math.round(daysNum * 12000)} for entire trip`,
     },
-    accommodation: `Comfortable hotel in prime ${destination} location`
+    travelTips: [
+      `Book accommodations in ${destination} in advance`,
+      'Carry local currency for small purchases',
+      'Use local transport to save money',
+      'Keep copies of all important documents',
+      'Research local customs before visiting',
+    ],
+    packingList: [
+      'Comfortable walking shoes',
+      'Weather-appropriate clothing',
+      'Camera and power bank',
+      'Travel documents',
+      'Basic medicines',
+    ],
+    bestTimeToVisit: `Research ${destination} weather for best travel months`,
+    localCurrency: 'Check current exchange rates',
+    language: 'Check local language and download translation app',
+    heroImage: { primary: getDestImage(destination), thumbnail: getDestImage(destination), fallback: getDestImage(destination) },
   };
-};
-
-const getDestinationLocationData = (destination) => {
-  const city = destination.toLowerCase();
-  if (city.includes('paris')) return { activities: [
-    { name: 'Eiffel Tower visit', description: 'Iconic iron lattice tower with panoramic city views', location: 'Champ de Mars, 7th arrondissement' },
-    { name: 'Louvre Museum tour', description: "World's largest art museum featuring the Mona Lisa", location: 'Rue de Rivoli, 1st arrondissement' },
-    { name: 'Seine River cruise', description: "Romantic boat ride along Paris's historic river", location: 'Port de la Bourdonnais' },
-    { name: 'Notre-Dame Cathedral', description: 'Gothic masterpiece on Île de la Cité', location: 'Île de la Cité, 4th arrondissement' },
-    { name: 'Champs-Élysées stroll', description: 'Famous avenue for shopping and people-watching', location: '8th arrondissement' },
-    { name: 'Montmartre exploration', description: 'Artistic hilltop district with Sacré-Cœur Basilica', location: '18th arrondissement' },
-    { name: 'Latin Quarter dining', description: 'Historic neighborhood with cozy bistros', location: '5th arrondissement' },
-    { name: 'Versailles Palace', description: 'Opulent royal palace with magnificent gardens', location: 'Versailles (day trip)' },
-    { name: 'Marais district walk', description: 'Trendy area with boutiques and galleries', location: '3rd and 4th arrondissements' },
-    { name: 'Arc de Triomphe', description: 'Triumphal arch at Place Charles de Gaulle', location: 'Place Charles de Gaulle' }
-  ]};
-  if (city.includes('tokyo')) return { activities: [
-    { name: 'Senso-ji Temple visit', description: 'Ancient Buddhist temple in Asakusa district', location: 'Asakusa, Taito City' },
-    { name: 'Shibuya Crossing experience', description: "World's busiest pedestrian crossing", location: 'Shibuya district' },
-    { name: 'Tokyo Skytree ascent', description: 'Tallest structure in Japan with breathtaking views', location: 'Sumida City' },
-    { name: 'Tsukiji Outer Market', description: 'Fresh seafood and street food paradise', location: 'Chuo City' },
-    { name: 'Meiji Shrine visit', description: 'Peaceful Shinto shrine in urban forest', location: 'Shibuya City' },
-    { name: 'Harajuku fashion district', description: 'Youth culture and quirky fashion hub', location: 'Shibuya City' },
-    { name: 'Imperial Palace gardens', description: "Serene gardens around the Emperor's residence", location: 'Chiyoda City' },
-    { name: 'Ginza shopping', description: 'Upscale shopping and dining district', location: 'Chuo City' },
-    { name: 'Shinjuku nightlife', description: 'Vibrant entertainment and dining district', location: 'Shinjuku district' },
-    { name: 'Traditional ryokan dinner', description: 'Authentic Japanese dining experience', location: 'Various locations' }
-  ]};
-  if (city.includes('rome')) return { activities: [
-    { name: 'Colosseum tour', description: 'Ancient amphitheater where gladiators once fought', location: 'Piazza del Colosseo' },
-    { name: 'Vatican Museums', description: 'Sistine Chapel and world-class art collection', location: 'Vatican City' },
-    { name: 'Trevi Fountain visit', description: 'Baroque fountain perfect for coin-throwing wishes', location: 'Piazza di Trevi' },
-    { name: 'Roman Forum exploration', description: "Ancient ruins of Roman civilization's heart", location: 'Via della Salara Vecchia' },
-    { name: 'Pantheon visit', description: 'Best-preserved Roman building with stunning dome', location: 'Piazza della Rotonda' },
-    { name: 'Spanish Steps climb', description: 'Famous stairway at Piazza di Spagna', location: 'Piazza di Spagna' },
-    { name: 'Trastevere dining', description: 'Charming neighborhood with authentic trattorias', location: 'Trastevere district' },
-    { name: "Castel Sant'Angelo", description: 'Towering cylindrical building with papal history', location: 'Lungotevere Castello' },
-    { name: 'Villa Borghese gardens', description: 'Beautiful park with museums and galleries', location: 'Villa Borghese' },
-    { name: "Campo de' Fiori market", description: 'Vibrant morning market and evening nightlife', location: "Campo de' Fiori" }
-  ]};
-  return { activities: [
-    { name: `${destination} city center tour`, description: 'Explore the heart of the city', location: 'City center' },
-    { name: `${destination} main attraction`, description: 'Visit the most famous landmark', location: 'Tourist district' },
-    { name: `${destination} cultural experience`, description: 'Immerse in local culture', location: 'Cultural quarter' },
-    { name: `${destination} local market`, description: 'Experience local life and shopping', location: 'Market district' },
-    { name: `${destination} scenic viewpoint`, description: 'Best views of the city', location: 'Observation area' },
-    { name: `${destination} museum visit`, description: 'Learn about local history and art', location: 'Museum district' },
-    { name: `${destination} dining experience`, description: 'Taste authentic local cuisine', location: 'Restaurant area' },
-    { name: `${destination} evening entertainment`, description: 'Local nightlife and shows', location: 'Entertainment district' },
-    { name: `${destination} park or garden`, description: 'Relax in natural surroundings', location: 'Green spaces' },
-    { name: `${destination} shopping area`, description: 'Browse local shops and souvenirs', location: 'Shopping district' }
-  ]};
 };
 
 export const generateTripSummary = (tripData) => {
-  return `🌟 *AI Travel Plan for ${tripData.destination}* 🌟
+  return `🌟 *AI Travel Plan — ${tripData.destination}* 🌟
 
 📅 *Duration:* ${tripData.duration}
 📆 *Dates:* ${tripData.dates}
 
-✨ *Trip Overview:*
+✨ *Overview:*
 ${tripData.overview}
 
-🎯 *Highlights:*
+🎯 *Top Highlights:*
 ${tripData.highlights?.map(h => `• ${h}`).join('\n') || 'Amazing experiences await!'}
 
-💰 *Estimated Budget:* ${tripData.budgetEstimate?.total || 'Budget details in full plan'}
+💰 *Budget:* ${tripData.budgetEstimate?.total || 'See full plan'}
 
-🎒 *Ready for an amazing adventure?*
-Your personalized itinerary is ready!
-
-Generated by AI Travel Planner ✈️
-
-*Contact for full detailed itinerary and bookings*`;
+Generated by AI Travel Planner ✈️`;
 };
