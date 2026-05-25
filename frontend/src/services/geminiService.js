@@ -52,7 +52,18 @@ export const generateTripPlan = async (destination, startDate, endDate, days, pr
       model = genAI.getGenerativeModel({ model: 'gemini-pro' });
     }
 
-    const prompt = `You are an expert travel planner with deep knowledge of every destination worldwide. Create a highly detailed ${days}-day trip itinerary for ${destination}.
+    const prompt = `You are an expert travel planner. Create a ${days}-day trip itinerary for ${destination} in the EXACT structured format below.
+
+FORMAT RULES — STRICTLY FOLLOW:
+- Each day must have: a clear title, a short description, "thingsToDo" list (bullet points of real activities/places), "food" object with breakfast/lunch/dinner (real restaurant names), "hotel" (real hotel name), "travelTip"
+- Use ONLY real place names — NO generic names
+- Kashmir: Dal Lake, Gulmarg Gondola, Pahalgam, Betaab Valley, Aru Valley, Sonamarg, Thajiwas Glacier, Shankaracharya Temple, Hazratbal Mosque, Shalimar Bagh, Nishat Bagh, Lal Chowk, Polo View Market
+- Kashmir food: Rogan Josh, Gushtaba, Yakhni, Wazwan, Kashmiri Kahwa, Dum Aloo, Modur Pulao, Sheer Chai
+- Kashmir hotels: The Lalit Grand Palace, Houseboat on Dal Lake, Hotel Broadway, Vivanta Dal View, Grand Mumtaz Resort
+- For every destination use the ACTUAL airport name
+- All costs in Indian Rupees (₹)
+- Last day: shopping + departure
+- Shopping for Kashmir: Pashmina shawls, Saffron, Dry fruits, Walnut wood handicrafts, Kashmiri carpets, Papier-mâché items
 
 CRITICAL RULES — MUST FOLLOW:
 1. Use ONLY 100% real, existing, named places — NO generic names like "Local Restaurant" or "Tourist Area"
@@ -72,76 +83,29 @@ Return ONLY valid JSON (no markdown, no extra text):
   "destination": "${destination}",
   "duration": "${days} days",
   "dates": "${startDate} to ${endDate}",
-  "overview": "2-3 compelling sentences about ${destination} with specific details",
-  "highlights": [
-    "[REAL PLACE NAME] — specific reason to visit",
-    "[REAL PLACE NAME] — specific reason to visit",
-    "[REAL PLACE NAME] — specific reason to visit",
-    "[REAL PLACE NAME] — specific reason to visit",
-    "[REAL PLACE NAME] — specific reason to visit"
-  ],
+  "overview": "2-3 sentences about ${destination} — what makes it special",
+  "highlights": ["Real place 1", "Real place 2", "Real place 3", "Real place 4", "Real place 5"],
   "dailyItinerary": [
     {
       "day": 1,
       "date": "${startDate}",
-      "title": "Arrival & First Exploration",
-      "activities": [
-        {
-          "time": "10:00 AM",
-          "activity": "Arrive at [ACTUAL AIRPORT NAME]",
-          "description": "Detailed arrival instructions, transport options with prices",
-          "location": "[Actual airport full name], [City]",
-          "duration": "1.5 hours",
-          "cost": "₹600-1200 (taxi/cab to hotel)"
-        },
-        {
-          "time": "12:00 PM",
-          "activity": "Check-in at [REAL HOTEL/AREA NAME]",
-          "description": "Check into hotel. Freshen up. Brief area orientation.",
-          "location": "[Real neighborhood — e.g. Dal Lake Boulevard, Srinagar]",
-          "duration": "1 hour",
-          "cost": "₹2500-8000/night"
-        },
-        {
-          "time": "01:30 PM",
-          "activity": "Lunch at [REAL RESTAURANT NAME]",
-          "description": "Try [specific local dishes]. [Restaurant known for what]",
-          "location": "[Real restaurant name & area]",
-          "duration": "1 hour",
-          "cost": "₹400-900 per person"
-        },
-        {
-          "time": "03:00 PM",
-          "activity": "Visit [REAL LANDMARK NAME]",
-          "description": "[History, what to see, best photo spots, insider tips]",
-          "location": "[Real address/area]",
-          "duration": "2 hours",
-          "cost": "₹50-500 entry"
-        },
-        {
-          "time": "06:30 PM",
-          "activity": "[REAL EVENING ACTIVITY/PLACE]",
-          "description": "[Specific evening experience at this destination]",
-          "location": "[Real place name]",
-          "duration": "1.5 hours",
-          "cost": "₹200-600"
-        },
-        {
-          "time": "08:00 PM",
-          "activity": "Dinner at [REAL RESTAURANT NAME]",
-          "description": "[Specific dishes to try, ambiance, specialty]",
-          "location": "[Real restaurant/area name]",
-          "duration": "1.5 hours",
-          "cost": "₹500-1200 per person"
-        }
+      "title": "Arrive in [City Name]",
+      "description": "One line about what this day is about",
+      "thingsToDo": [
+        "Arrive at [REAL AIRPORT NAME] — take cab to hotel (₹600-1000)",
+        "Check-in at [REAL HOTEL NAME]",
+        "Evening Shikara ride on Dal Lake",
+        "Visit [REAL PLACE]",
+        "Stroll at [REAL MARKET/AREA]"
       ],
-      "meals": {
-        "breakfast": "[Real breakfast place or hotel name]",
-        "lunch": "[Real restaurant name]",
-        "dinner": "[Real restaurant name]"
+      "food": {
+        "breakfast": "Hotel breakfast at [Hotel Name]",
+        "lunch": "[Real Restaurant Name] — try [specific dish]",
+        "dinner": "[Real Restaurant Name] — must try [specific dish]"
       },
-      "accommodation": "[Real hotel name or area] — [why good location]",
-      "dailyCost": "₹4000-9000 per person"
+      "hotel": "[Real Hotel Name], [Area]",
+      "dailyCost": "₹4000-8000 per person",
+      "travelTip": "[One practical tip for this day]"
     }
   ],
   "budgetEstimate": {
@@ -152,20 +116,14 @@ Return ONLY valid JSON (no markdown, no extra text):
     "shopping": "₹2000-10000 (optional)",
     "total": "₹${Math.round(days * 4000)}-₹${Math.round(days * 12000)} for entire trip"
   },
-  "travelTips": [
-    "[Specific transport tip for ${destination}]",
-    "[Cultural/etiquette tip specific to ${destination}]",
-    "[Best time to visit key attractions]",
-    "[Local food must-try tip]",
-    "[Safety/practical tip for ${destination}]"
-  ],
-  "bestTimeToVisit": "[Specific months and weather for ${destination}]",
-  "localCurrency": "[Currency and payment tips]",
-  "language": "[Local language and 3-4 useful phrases]",
+  "mustEat": ["[Dish 1]", "[Dish 2]", "[Dish 3]", "[Dish 4]", "[Dish 5]"],
+  "mustBuy": ["[Item 1]", "[Item 2]", "[Item 3]", "[Item 4]"],
+  "travelTips": ["tip1", "tip2", "tip3", "tip4", "tip5"],
+  "bestTimeToVisit": "[Months and why]",
   "emergencyNumbers": "Police: 100, Ambulance: 108, Tourist Helpline: 1800-111-363"
 }
 
-Generate ALL ${days} days with REAL, SPECIFIC place names for ${destination}. Every activity must have a real named location.
+Generate ALL ${days} days. Each day MUST have thingsToDo as a bullet list of real activities.
 Additional preferences: ${preferences || 'Standard comfortable travel'}`;
 
     const result = await model.generateContent(prompt);

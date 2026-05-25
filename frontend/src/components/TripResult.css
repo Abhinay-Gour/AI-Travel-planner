@@ -108,8 +108,88 @@
 .budget-label { color: var(--muted); font-size: 0.85rem; }
 .budget-value { color: #a5b4fc; font-weight: 700; font-size: 0.85rem; }
 
-/* Day cards */
-.day-cards { display: flex; flex-direction: column; gap: 12px; }
+.day-description {
+  color: var(--muted); font-size: 0.85rem; line-height: 1.5;
+  margin: 0 0 12px; font-style: italic;
+}
+
+.day-section { margin-bottom: 14px; }
+.day-section-title {
+  font-size: 0.75rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.07em; color: var(--indigo); margin-bottom: 8px;
+}
+
+.things-list {
+  list-style: none; padding: 0; margin: 0;
+  display: flex; flex-direction: column; gap: 6px;
+}
+.things-list li {
+  color: var(--muted); font-size: 0.85rem; line-height: 1.5;
+  padding: 7px 12px 7px 30px; position: relative;
+  background: rgba(255,255,255,0.02); border-radius: 8px;
+  border-left: 2px solid var(--indigo);
+}
+.things-list li::before {
+  content: '✦'; position: absolute; left: 10px;
+  color: var(--indigo); font-size: 0.6rem; top: 10px;
+}
+
+.food-grid { display: flex; flex-direction: column; gap: 6px; }
+.food-item {
+  display: flex; gap: 10px; align-items: flex-start;
+  padding: 7px 12px; background: rgba(16,185,129,0.05);
+  border-radius: 8px; border: 1px solid rgba(16,185,129,0.1);
+  font-size: 0.83rem; color: var(--muted);
+}
+.food-label {
+  color: rgba(52,211,153,0.9); font-weight: 700;
+  font-size: 0.78rem; white-space: nowrap; min-width: 80px;
+}
+
+.day-footer {
+  display: flex; gap: 12px; flex-wrap: wrap;
+  margin-top: 12px; padding-top: 10px;
+  border-top: 1px solid var(--border);
+  font-size: 0.8rem; color: var(--gray);
+}
+
+.day-tip {
+  margin-top: 8px; padding: 8px 12px;
+  background: rgba(245,158,11,0.07);
+  border: 1px solid rgba(245,158,11,0.15);
+  border-radius: 8px; font-size: 0.8rem;
+  color: #fbbf24; line-height: 1.5;
+}
+
+/* Must Eat & Must Buy */
+.must-section {
+  margin-bottom: 20px; padding: 18px;
+  background: var(--card2); border-radius: 14px;
+  border: 1px solid var(--border);
+  display: flex; flex-direction: column; gap: 16px;
+}
+.must-block {}
+.must-title {
+  font-size: 0.85rem; font-weight: 700; color: var(--white);
+  margin-bottom: 10px;
+}
+.must-tags { display: flex; flex-wrap: wrap; gap: 7px; }
+.must-tag {
+  padding: 5px 13px; border-radius: 20px;
+  font-size: 0.78rem; font-weight: 600;
+}
+.food-tag {
+  background: rgba(16,185,129,0.1);
+  border: 1px solid rgba(16,185,129,0.2);
+  color: rgba(52,211,153,0.9);
+}
+.buy-tag {
+  background: rgba(245,158,11,0.1);
+  border: 1px solid rgba(245,158,11,0.2);
+  color: #fbbf24;
+}
+
+
 .day-card {
   background: rgba(255,255,255,0.02); border: 1px solid var(--border);
   border-radius: 13px; padding: 16px;
