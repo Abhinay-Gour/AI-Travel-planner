@@ -25,12 +25,20 @@ const allowedOrigins = [
   'http://localhost:5174',
   'http://localhost:4173',
   'https://aitravelplanner-seven.vercel.app',
+  'https://aitravel.vercel.app',
+  'https://ai-travel-planner.vercel.app',
   process.env.FRONTEND_URL,
 ].filter(Boolean);
 
+// Allow all Vercel preview deployments
+const isVercelPreview = (origin) => origin && (
+  origin.endsWith('.vercel.app') ||
+  origin.includes('vercel.app')
+);
+
 app.use(cors({
   origin: (origin, callback) => {
-    if (!origin || allowedOrigins.includes(origin)) return callback(null, true);
+    if (!origin || allowedOrigins.includes(origin) || isVercelPreview(origin)) return callback(null, true);
     callback(new Error('Not allowed by CORS'));
   },
   credentials: true,
