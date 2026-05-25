@@ -58,34 +58,34 @@ const DestinationsExplorer = () => {
   };
 
   return (
-    <div style={{ paddingTop: '80px', minHeight: '100vh', padding: '100px 6vw 60px' }}>
+    <div style={{ minHeight: '100vh', padding: 'clamp(80px, 12vw, 100px) clamp(14px, 6vw, 60px) 80px' }}>
       <div className="section-label">Explore</div>
       <h2 className="section-title">Destinations Explorer 🌍</h2>
       <p className="section-sub">Browse {DESTINATIONS.length}+ destinations — filter by vibe, budget & more</p>
 
       {/* Filters */}
-      <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border)', borderRadius: 16, padding: '20px', marginBottom: 28 }}>
+      <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border)', borderRadius: 16, padding: 'clamp(14px, 3vw, 20px)', marginBottom: 28 }}>
         <input value={search} onChange={e => setSearch(e.target.value)} placeholder="🔍 Search destination or country..."
           style={{ width: '100%', padding: '10px 16px', background: 'rgba(255,255,255,0.04)', border: '1.5px solid var(--border)', borderRadius: 10, color: 'var(--white)', fontFamily: 'Inter, sans-serif', fontSize: '0.9rem', marginBottom: 16, boxSizing: 'border-box', outline: 'none' }}
           onFocus={e => e.target.style.borderColor = 'var(--indigo)'}
           onBlur={e => e.target.style.borderColor = 'var(--border)'} />
 
-        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 12 }}>
-          <span style={{ color: 'var(--gray)', fontSize: '0.75rem', alignSelf: 'center', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Vibe:</span>
+        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 12 }}>
+          <span style={{ color: 'var(--gray)', fontSize: '0.72rem', alignSelf: 'center', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Vibe:</span>
           {VIBES.map(v => (
             <button key={v} onClick={() => setVibe(v)}
-              style={{ padding: '5px 12px', borderRadius: 20, border: `1px solid ${vibe === v ? 'var(--indigo)' : 'var(--border)'}`, background: vibe === v ? 'var(--indigo3)' : 'transparent', color: vibe === v ? '#a5b4fc' : 'var(--gray)', fontSize: '0.78rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'Inter, sans-serif', transition: 'all 0.2s' }}>
+              style={{ padding: '4px 10px', borderRadius: 20, border: `1px solid ${vibe === v ? 'var(--indigo)' : 'var(--border)'}`, background: vibe === v ? 'var(--indigo3)' : 'transparent', color: vibe === v ? '#a5b4fc' : 'var(--gray)', fontSize: '0.74rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'Inter, sans-serif', transition: 'all 0.2s' }}>
               {v}
             </button>
           ))}
         </div>
 
-        <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', alignItems: 'center' }}>
-          <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
-            <span style={{ color: 'var(--gray)', fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Country:</span>
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
+          <div style={{ display: 'flex', gap: 5, alignItems: 'center', flexWrap: 'wrap' }}>
+            <span style={{ color: 'var(--gray)', fontSize: '0.72rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Country:</span>
             {COUNTRIES.map(c => (
               <button key={c} onClick={() => setCountry(c)}
-                style={{ padding: '5px 12px', borderRadius: 20, border: `1px solid ${country === c ? 'var(--indigo)' : 'var(--border)'}`, background: country === c ? 'var(--indigo3)' : 'transparent', color: country === c ? '#a5b4fc' : 'var(--gray)', fontSize: '0.78rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'Inter, sans-serif', transition: 'all 0.2s' }}>
+                style={{ padding: '4px 10px', borderRadius: 20, border: `1px solid ${country === c ? 'var(--indigo)' : 'var(--border)'}`, background: country === c ? 'var(--indigo3)' : 'transparent', color: country === c ? '#a5b4fc' : 'var(--gray)', fontSize: '0.74rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'Inter, sans-serif', transition: 'all 0.2s' }}>
                 {c}
               </button>
             ))}
@@ -100,7 +100,7 @@ const DestinationsExplorer = () => {
 
       <div style={{ color: 'var(--gray)', fontSize: '0.8rem', marginBottom: 16, fontWeight: 500 }}>{filtered.length} destinations found</div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(280px,1fr))', gap: 18 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(min(280px,100%),1fr))', gap: 'clamp(12px, 2vw, 18px)' }}>
         {filtered.map(dest => (
           <div key={dest.id} style={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 18, overflow: 'hidden', transition: 'transform 0.25s, border-color 0.25s, box-shadow 0.25s' }}
             onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-5px)'; e.currentTarget.style.borderColor = 'rgba(99,102,241,0.3)'; e.currentTarget.style.boxShadow = '0 14px 36px rgba(0,0,0,0.3)'; }}
@@ -110,7 +110,7 @@ const DestinationsExplorer = () => {
               <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(transparent 40%,rgba(0,0,0,0.72))' }} />
               <div style={{ position: 'absolute', top: 10, right: 10, background: 'rgba(0,0,0,0.55)', borderRadius: 20, padding: '3px 10px', color: '#fbbf24', fontSize: '0.75rem', fontWeight: 700 }}>⭐ {dest.rating}</div>
               <div style={{ position: 'absolute', bottom: 12, left: 12 }}>
-                <div style={{ color: 'white', fontWeight: 800, fontSize: '1.15rem', letterSpacing: '-0.01em' }}>{dest.name}</div>
+                <div style={{ color: 'white', fontWeight: 800, fontSize: '1.1rem', letterSpacing: '-0.01em' }}>{dest.name}</div>
                 <div style={{ color: 'rgba(255,255,255,0.65)', fontSize: '0.75rem' }}>📍 {dest.country}</div>
               </div>
             </div>
@@ -121,13 +121,13 @@ const DestinationsExplorer = () => {
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 7, marginBottom: 14 }}>
                 {[['💰 Budget', dest.budget], ['📅 Days', dest.days], ['🗓️ Best Time', dest.best], ['💬 Reviews', dest.reviews.toLocaleString()]].map(([label, val]) => (
                   <div key={label} style={{ background: 'rgba(255,255,255,0.03)', borderRadius: 8, padding: '6px 10px' }}>
-                    <div style={{ color: 'var(--gray)', fontSize: '0.65rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em' }}>{label}</div>
-                    <div style={{ color: 'var(--white)', fontSize: '0.8rem', fontWeight: 600, marginTop: 2 }}>{val}</div>
+                    <div style={{ color: 'var(--gray)', fontSize: '0.62rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em' }}>{label}</div>
+                    <div style={{ color: 'var(--white)', fontSize: '0.78rem', fontWeight: 600, marginTop: 2 }}>{val}</div>
                   </div>
                 ))}
               </div>
               <button onClick={() => handlePlan(dest)}
-                style={{ width: '100%', padding: '10px', background: 'linear-gradient(135deg, var(--rose), var(--deep))', border: 'none', borderRadius: 10, color: 'white', fontFamily: 'Inter, sans-serif', fontWeight: 700, fontSize: '0.875rem', cursor: 'pointer', boxShadow: '0 4px 14px var(--glow-rose)', transition: 'all 0.2s' }}
+                style={{ width: '100%', padding: '11px', background: 'linear-gradient(135deg, var(--rose), var(--deep))', border: 'none', borderRadius: 10, color: 'white', fontFamily: 'Inter, sans-serif', fontWeight: 700, fontSize: '0.875rem', cursor: 'pointer', boxShadow: '0 4px 14px var(--glow-rose)', transition: 'all 0.2s' }}
                 onMouseEnter={e => e.target.style.transform = 'translateY(-1px)'}
                 onMouseLeave={e => e.target.style.transform = 'translateY(0)'}>
                 ✈️ Plan This Trip

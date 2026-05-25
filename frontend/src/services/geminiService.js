@@ -52,16 +52,19 @@ export const generateTripPlan = async (destination, startDate, endDate, days, pr
       model = genAI.getGenerativeModel({ model: 'gemini-pro' });
     }
 
-    const prompt = `You are an expert travel planner. Create a detailed ${days}-day trip itinerary for ${destination}.
+    const prompt = `You are an expert travel planner with deep knowledge of every destination worldwide. Create a highly detailed ${days}-day trip itinerary for ${destination}.
 
-IMPORTANT RULES:
-- Use ONLY real, existing places with actual names
-- Include airport name, real hotel areas, real restaurants, real attractions
-- All costs in Indian Rupees (₹)
-- Times should be realistic (not too rushed)
-- Include breakfast, lunch, dinner for each day
-- Day 1 starts with airport arrival
-- Last day ends with airport departure
+CRITICAL RULES — MUST FOLLOW:
+1. Use ONLY 100% real, existing, named places — NO generic names like "Local Restaurant" or "Tourist Area"
+2. For Kashmir: use Srinagar, Dal Lake, Gulmarg, Pahalgam, Sonamarg, Shankaracharya Temple, Hazratbal Mosque, Mughal Gardens (Shalimar Bagh, Nishat Bagh, Chashme Shahi), Lal Chowk, Boulevard Road, Dachigam National Park, Betaab Valley, Aru Valley, Baisaran (Mini Switzerland), Zero Point, Apharwat Peak, Gondola Cable Car, Wular Lake, Nagin Lake, Pari Mahal, etc.
+3. For every destination, name the ACTUAL airport (e.g. Sheikh ul-Alam International Airport for Srinagar, Indira Gandhi International for Delhi)
+4. Name REAL hotels/areas (e.g. Houseboat on Dal Lake, The Lalit Grand Palace Srinagar, Hotel Broadway)
+5. Name REAL restaurants and local food (e.g. Ahdoos Restaurant, Mughal Darbar, Shamyana for Kashmiri Wazwan)
+6. Name REAL markets (e.g. Lal Chowk, Polo View Market, Residency Road for Kashmir)
+7. All costs in Indian Rupees (₹)
+8. Realistic timings with proper travel time between places
+9. Day 1: airport arrival → hotel check-in → nearby exploration
+10. Last day: morning sightseeing → airport departure
 
 Return ONLY valid JSON (no markdown, no extra text):
 
@@ -69,12 +72,13 @@ Return ONLY valid JSON (no markdown, no extra text):
   "destination": "${destination}",
   "duration": "${days} days",
   "dates": "${startDate} to ${endDate}",
-  "overview": "2-3 sentences about why ${destination} is amazing to visit",
+  "overview": "2-3 compelling sentences about ${destination} with specific details",
   "highlights": [
-    "Real famous place 1 - brief description",
-    "Real famous place 2 - brief description",
-    "Real famous place 3 - brief description",
-    "Real famous place 4 - brief description"
+    "[REAL PLACE NAME] — specific reason to visit",
+    "[REAL PLACE NAME] — specific reason to visit",
+    "[REAL PLACE NAME] — specific reason to visit",
+    "[REAL PLACE NAME] — specific reason to visit",
+    "[REAL PLACE NAME] — specific reason to visit"
   ],
   "dailyItinerary": [
     {
@@ -84,84 +88,84 @@ Return ONLY valid JSON (no markdown, no extra text):
       "activities": [
         {
           "time": "10:00 AM",
-          "activity": "Arrive at [REAL AIRPORT NAME]",
-          "description": "Land at airport, clear immigration, collect baggage. Take [metro/taxi/bus] to hotel area.",
-          "location": "[Real airport name], [City]",
-          "duration": "2 hours",
-          "cost": "₹800 (taxi to hotel)",
-          "tips": "Book airport taxi in advance to avoid overcharging"
-        },
-        {
-          "time": "12:30 PM",
-          "activity": "Hotel Check-in & Freshen Up",
-          "description": "Check into hotel in [REAL NEIGHBORHOOD]. Rest and freshen up after journey.",
-          "location": "[Real neighborhood/area name]",
-          "duration": "1 hour",
-          "cost": "₹3000-8000/night"
-        },
-        {
-          "time": "02:00 PM",
-          "activity": "Lunch at [REAL LOCAL RESTAURANT/AREA]",
-          "description": "Try authentic local cuisine. Must try: [specific local dish names]",
-          "location": "[Real restaurant area or market name]",
-          "duration": "1 hour",
-          "cost": "₹400-800 per person"
-        },
-        {
-          "time": "03:30 PM",
-          "activity": "Visit [REAL FAMOUS LANDMARK]",
-          "description": "[What makes this place special, history, what to see there]",
-          "location": "[Real address or area]",
-          "duration": "2-3 hours",
-          "cost": "₹500-1500 entry",
-          "tips": "[Specific tip for this place]"
-        },
-        {
-          "time": "07:00 PM",
-          "activity": "Dinner at [REAL RESTAURANT AREA]",
-          "description": "Evening dinner with local specialties. [Specific food recommendations]",
-          "location": "[Real area name]",
+          "activity": "Arrive at [ACTUAL AIRPORT NAME]",
+          "description": "Detailed arrival instructions, transport options with prices",
+          "location": "[Actual airport full name], [City]",
           "duration": "1.5 hours",
-          "cost": "₹600-1200 per person"
+          "cost": "₹600-1200 (taxi/cab to hotel)"
+        },
+        {
+          "time": "12:00 PM",
+          "activity": "Check-in at [REAL HOTEL/AREA NAME]",
+          "description": "Check into hotel. Freshen up. Brief area orientation.",
+          "location": "[Real neighborhood — e.g. Dal Lake Boulevard, Srinagar]",
+          "duration": "1 hour",
+          "cost": "₹2500-8000/night"
+        },
+        {
+          "time": "01:30 PM",
+          "activity": "Lunch at [REAL RESTAURANT NAME]",
+          "description": "Try [specific local dishes]. [Restaurant known for what]",
+          "location": "[Real restaurant name & area]",
+          "duration": "1 hour",
+          "cost": "₹400-900 per person"
+        },
+        {
+          "time": "03:00 PM",
+          "activity": "Visit [REAL LANDMARK NAME]",
+          "description": "[History, what to see, best photo spots, insider tips]",
+          "location": "[Real address/area]",
+          "duration": "2 hours",
+          "cost": "₹50-500 entry"
+        },
+        {
+          "time": "06:30 PM",
+          "activity": "[REAL EVENING ACTIVITY/PLACE]",
+          "description": "[Specific evening experience at this destination]",
+          "location": "[Real place name]",
+          "duration": "1.5 hours",
+          "cost": "₹200-600"
+        },
+        {
+          "time": "08:00 PM",
+          "activity": "Dinner at [REAL RESTAURANT NAME]",
+          "description": "[Specific dishes to try, ambiance, specialty]",
+          "location": "[Real restaurant/area name]",
+          "duration": "1.5 hours",
+          "cost": "₹500-1200 per person"
         }
       ],
       "meals": {
-        "breakfast": "Hotel breakfast or [specific local breakfast place]",
-        "lunch": "[Real restaurant or food area name]",
-        "dinner": "[Real restaurant area or specific restaurant]"
+        "breakfast": "[Real breakfast place or hotel name]",
+        "lunch": "[Real restaurant name]",
+        "dinner": "[Real restaurant name]"
       },
-      "accommodation": "Stay in [real neighborhood] - good location for sightseeing",
-      "dailyCost": "₹5000-8000 per person"
+      "accommodation": "[Real hotel name or area] — [why good location]",
+      "dailyCost": "₹4000-9000 per person"
     }
   ],
   "budgetEstimate": {
     "accommodation": "₹2000-8000 per night",
-    "food": "₹1500-3000 per day",
-    "activities": "₹5000-15000 total",
-    "transportation": "₹3000-8000 total",
+    "food": "₹1200-3000 per day",
+    "activities": "₹3000-12000 total",
+    "transportation": "₹2000-6000 total",
+    "shopping": "₹2000-10000 (optional)",
     "total": "₹${Math.round(days * 4000)}-₹${Math.round(days * 12000)} for entire trip"
   },
   "travelTips": [
-    "Specific tip about ${destination} transport",
-    "Cultural tip specific to ${destination}",
-    "Best time to visit specific attractions",
-    "Money/payment tip for ${destination}",
-    "Safety tip for ${destination}"
+    "[Specific transport tip for ${destination}]",
+    "[Cultural/etiquette tip specific to ${destination}]",
+    "[Best time to visit key attractions]",
+    "[Local food must-try tip]",
+    "[Safety/practical tip for ${destination}]"
   ],
-  "packingList": [
-    "Weather-appropriate clothing for ${destination}",
-    "Comfortable walking shoes",
-    "Camera and power bank",
-    "Travel documents and copies",
-    "Basic medicines and first aid"
-  ],
-  "bestTimeToVisit": "Specific months and why for ${destination}",
-  "localCurrency": "Currency name and exchange rate from INR",
-  "language": "Local language and useful phrases",
-  "emergencyNumbers": "Police: [number], Ambulance: [number], Tourist helpline: [number]"
+  "bestTimeToVisit": "[Specific months and weather for ${destination}]",
+  "localCurrency": "[Currency and payment tips]",
+  "language": "[Local language and 3-4 useful phrases]",
+  "emergencyNumbers": "Police: 100, Ambulance: 108, Tourist Helpline: 1800-111-363"
 }
 
-Generate ALL ${days} days in dailyItinerary array with REAL places for ${destination}.
+Generate ALL ${days} days with REAL, SPECIFIC place names for ${destination}. Every activity must have a real named location.
 Additional preferences: ${preferences || 'Standard comfortable travel'}`;
 
     const result = await model.generateContent(prompt);

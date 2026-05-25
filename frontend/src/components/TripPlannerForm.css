@@ -135,6 +135,22 @@
 
 @media (max-width: 768px) {
   .trip-planner-overlay { padding: 0; align-items: flex-end; }
-  .trip-planner-modal { border-radius: 20px 20px 0 0; max-height: 92vh; padding: 22px 18px; margin: 0; }
-  .form-row { grid-template-columns: 1fr; }
+  .trip-planner-modal {
+    border-radius: 20px 20px 0 0;
+    max-height: 95vh;
+    padding: 20px 14px 28px;
+    margin: 0;
+    width: 100%;
+  }
+  .modal-header h2 { font-size: 1.2rem; }
+  .form-row { grid-template-columns: 1fr; gap: 10px; }
+  .btn-generate { font-size: 0.9rem; padding: 13px; }
+  .auto-send-info { padding: 12px; }
+  .send-target { font-size: 0.78rem; }
+}
+
+@media (max-width: 400px) {
+  .trip-planner-modal { padding: 16px 12px 24px; }
+  .modal-header h2 { font-size: 1.1rem; }
+  .form-group input, .form-group textarea { font-size: 0.85rem; padding: 10px 12px; }
 }

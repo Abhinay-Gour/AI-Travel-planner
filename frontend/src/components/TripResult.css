@@ -237,13 +237,50 @@
 /* Responsive */
 @media (max-width: 768px) {
   .trip-result-overlay { padding: 0; align-items: flex-end; }
-  .trip-result-modal { border-radius: 20px 20px 0 0; max-height: 92vh; padding: 18px 14px; margin: 0; }
-  .result-header h2 { font-size: 1.2rem; }
-  .trip-meta { flex-direction: column; gap: 6px; }
-  .budget-grid { grid-template-columns: 1fr; }
-  .action-buttons { grid-template-columns: 1fr; }
-  .user-details { flex-direction: column; gap: 6px; }
+  .trip-result-modal {
+    border-radius: 20px 20px 0 0;
+    max-height: 95vh;
+    padding: 16px 12px 24px;
+    margin: 0;
+    width: 100%;
+  }
+  .result-header h2 { font-size: 1.1rem; }
+  .result-header { margin-bottom: 16px; padding-bottom: 12px; }
+  .destination-hero-image { height: 150px; }
+  .destination-overlay h3 { font-size: 1.3rem; }
+  .trip-meta { flex-direction: row; gap: 6px; flex-wrap: wrap; }
+  .trip-meta span { font-size: 0.72rem; padding: 3px 8px; }
+  .maps-embed { height: 160px; }
+  .overview-section, .highlights-section, .budget-section,
+  .itinerary-preview, .gallery-section { padding: 14px 12px; }
+  .budget-grid { grid-template-columns: 1fr; gap: 7px; }
+  .budget-item { padding: 8px 10px; }
+  .action-buttons { grid-template-columns: 1fr; gap: 8px; }
+  .share-btn { padding: 13px; font-size: 0.9rem; }
+  .user-details { flex-direction: column; gap: 5px; }
   .highlights-grid { grid-template-columns: 1fr; }
-  .destination-hero-image { height: 160px; }
+  .real-places-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .real-place-img { height: 100px; }
+  .real-place-info { padding: 8px 10px; }
+  .real-place-info h5 { font-size: 0.8rem; }
+  .real-place-info p { font-size: 0.72rem; }
+  .gallery-grid { grid-template-columns: repeat(3, 1fr); gap: 6px; }
+  .day-card { padding: 12px; }
+  .day-header { gap: 7px; }
+  .day-title { font-size: 0.82rem; }
+  .activity-item-enhanced { padding: 11px; }
+  .activity-name { font-size: 0.85rem; }
+  .activity-description { font-size: 0.78rem; }
+  .activity-location { flex-direction: column; gap: 4px; }
+  .lb-content { max-width: 95vw; }
+  .lb-prev { left: 8px; }
+  .lb-next { right: 8px; }
+}
+
+@media (max-width: 400px) {
+  .trip-result-modal { padding: 14px 10px 20px; }
   .real-places-grid { grid-template-columns: 1fr; }
+  .gallery-grid { grid-template-columns: repeat(2, 1fr); }
+  .result-header h2 { font-size: 1rem; }
+  .destination-overlay h3 { font-size: 1.1rem; }
 }
