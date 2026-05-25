@@ -286,88 +286,98 @@ const TripResult = ({ tripData, onClose }) => {
           doc.text(day.date || '', MARGIN, 18);
           y = 30;
 
-          // Hotel & daily cost bar
-          if (day.hotel || day.accommodation || day.dailyCost) {
-            y = checkY(y, 14);
-            doc.setFillColor(240, 244, 255);
-            doc.roundedRect(MARGIN, y, CONTENT_W, 12, 2, 2, 'F');
-            doc.setFontSize(8.5); doc.setFont('helvetica', 'normal'); doc.setTextColor(60, 70, 100);
-            const hotelText = day.hotel || day.accommodation || '';
-            if (hotelText) doc.text(`Hotel: ${hotelText}`, MARGIN + 3, y + 5);
-            if (day.dailyCost) doc.text(`Cost: ${day.dailyCost}`, W - MARGIN - 3, y + 5, { align: 'right' });
-            y += 16;
+          // Schedule items (new format)
+          if (day.schedule?.length) {
+            day.schedule.forEach((item, si) => {
+              y = checkY(y, 18);
+              // time badge
+              doc.setFillColor(99, 102, 241);
+              doc.roundedRect(MARGIN, y, 28, 7, 1, 1, 'F');
+              doc.setTextColor(255, 255, 255);
+              doc.setFontSize(7.5); doc.setFont('helvetica', 'bold');
+              doc.text(item.time || '', MARGIN + 2, y + 5);
+              // activity name
+              doc.setFontSize(10); doc.setFont('helvetica', 'bold'); doc.setTextColor(20, 20, 40);
+              const actText = doc.splitTextToSize(item.activity || '', CONTENT_W - 34);
+              doc.text(actText, MARGIN + 32, y + 5);
+              y += actText.length * 5 + 3;
+              // detail
+              if (item.detail) {
+                y = checkY(y, 8);
+                doc.setFontSize(8.5); doc.setFont('helvetica', 'normal'); doc.setTextColor(80, 85, 110);
+                const detLines = doc.splitTextToSize(item.detail, CONTENT_W - 6);
+                doc.text(detLines, MARGIN + 4, y);
+                y += detLines.length * 4.5 + 2;
+              }
+              // cost
+              if (item.cost) {
+                y = checkY(y, 6);
+                doc.setFontSize(8); doc.setTextColor(30, 140, 80);
+                doc.text(`Cost: ${item.cost}`, MARGIN + 4, y); y += 6;
+              }
+              // divider
+              doc.setDrawColor(220, 225, 240); doc.setLineWidth(0.2);
+              doc.line(MARGIN, y, W - MARGIN, y); y += 4;
+            });
           }
 
-          // Day description
-          if (day.description) {
-            y = checkY(y, 10);
-            doc.setFontSize(9); doc.setFont('helvetica', 'italic'); doc.setTextColor(100, 100, 130);
-            const dLines = doc.splitTextToSize(day.description, CONTENT_W - 4);
-            doc.text(dLines, MARGIN + 2, y);
-            y += dLines.length * 5 + 6;
-          }
-
-          // Things To Do (new format)
-          if (day.thingsToDo?.length) {
+          // thingsToDo fallback
+          if (!day.schedule && day.thingsToDo?.length) {
             y = checkY(y, 14);
             doc.setFontSize(9); doc.setFont('helvetica', 'bold'); doc.setTextColor(99, 102, 241);
             doc.text('THINGS TO DO', MARGIN + 2, y); y += 6;
             doc.setFont('helvetica', 'normal'); doc.setTextColor(40, 40, 60);
             day.thingsToDo.forEach((item, ti) => {
               y = checkY(y, 8);
-              doc.setFillColor(ti % 2 === 0 ? 248 : 252, ti % 2 === 0 ? 249 : 252, 255);
+              doc.setFillColor(ti % 2 === 0 ? 248 : 252, 249, 255);
               doc.rect(MARGIN, y - 3, CONTENT_W, 8, 'F');
-              doc.setFontSize(9);
-              const iLines = doc.splitTextToSize(`  * ${item}`, CONTENT_W - 6);
-              doc.text(iLines, MARGIN + 3, y + 2);
+              const iLines = doc.splitTextToSize(`* ${item}`, CONTENT_W - 6);
+              doc.setFontSize(9); doc.text(iLines, MARGIN + 3, y + 2);
               y += iLines.length * 5 + 2;
             });
             y += 4;
           }
 
-          // Old activities format fallback
-          if (!day.thingsToDo && day.activities?.length) {
+          // old activities fallback
+          if (!day.schedule && !day.thingsToDo && day.activities?.length) {
             day.activities.forEach((act, ai) => {
               y = checkY(y, 20);
-              const descLines = doc.splitTextToSize(act.description || '', CONTENT_W - 10);
-              const cardH = 7 + descLines.length * 4.5 + 8;
               doc.setFillColor(ai % 2 === 0 ? 252 : 248, 252, 255);
-              doc.roundedRect(MARGIN, y, CONTENT_W, cardH, 2, 2, 'F');
+              doc.roundedRect(MARGIN, y, CONTENT_W, 16, 2, 2, 'F');
               doc.setFontSize(9); doc.setFont('helvetica', 'bold'); doc.setTextColor(20, 20, 40);
               doc.text(`${act.time || ''} - ${act.activity || ''}`, MARGIN + 3, y + 6);
               doc.setFontSize(8.5); doc.setFont('helvetica', 'normal'); doc.setTextColor(80, 85, 110);
-              doc.text(descLines, MARGIN + 3, y + 12);
-              y += cardH + 3;
+              const dLines = doc.splitTextToSize(act.description || '', CONTENT_W - 6);
+              doc.text(dLines, MARGIN + 3, y + 11);
+              y += 16 + dLines.length * 4 + 3;
             });
           }
 
-          // Food / Meals
+          // Food
           const foodObj = day.food || day.meals;
           if (foodObj) {
-            y = checkY(y, 22);
+            y = checkY(y, 24);
             doc.setFillColor(235, 245, 235);
-            doc.roundedRect(MARGIN, y, CONTENT_W, 22, 2, 2, 'F');
+            doc.roundedRect(MARGIN, y, CONTENT_W, 24, 2, 2, 'F');
             doc.setFontSize(9); doc.setFont('helvetica', 'bold'); doc.setTextColor(30, 100, 50);
             doc.text('FOOD', MARGIN + 3, y + 6);
             doc.setFont('helvetica', 'normal'); doc.setTextColor(40, 80, 50); doc.setFontSize(8.5);
-            const bf = foodObj.breakfast || '';
-            const ln = foodObj.lunch || '';
-            const dn = foodObj.dinner || '';
-            if (bf) doc.text(`Breakfast: ${bf}`, MARGIN + 3, y + 12);
-            if (ln) { const lLines = doc.splitTextToSize(`Lunch: ${ln}`, CONTENT_W / 2 - 4); doc.text(lLines, MARGIN + 3, y + 17); }
-            if (dn) { const dLines = doc.splitTextToSize(`Dinner: ${dn}`, CONTENT_W / 2 - 4); doc.text(dLines, MARGIN + CONTENT_W / 2 + 2, y + 12); }
-            y += 26;
+            if (foodObj.breakfast) { const l = doc.splitTextToSize(`Breakfast: ${foodObj.breakfast}`, CONTENT_W - 6); doc.text(l, MARGIN + 3, y + 12); }
+            if (foodObj.lunch) { const l = doc.splitTextToSize(`Lunch: ${foodObj.lunch}`, CONTENT_W / 2 - 4); doc.text(l, MARGIN + 3, y + 18); }
+            if (foodObj.dinner) { const l = doc.splitTextToSize(`Dinner: ${foodObj.dinner}`, CONTENT_W / 2 - 4); doc.text(l, MARGIN + CONTENT_W / 2 + 2, y + 18); }
+            y += 28;
           }
 
-          // Travel tip
-          if (day.travelTip) {
+          // Tip
+          const tip = day.tip || day.travelTip;
+          if (tip) {
             y = checkY(y, 12);
             doc.setFillColor(255, 251, 235);
             doc.roundedRect(MARGIN, y, CONTENT_W, 10, 2, 2, 'F');
             doc.setFontSize(8); doc.setFont('helvetica', 'italic'); doc.setTextColor(120, 80, 0);
-            const tipLines = doc.splitTextToSize(`Tip: ${day.travelTip}`, CONTENT_W - 6);
-            doc.text(tipLines, MARGIN + 3, y + 5);
-            y += tipLines.length * 5 + 6;
+            const tLines = doc.splitTextToSize(`Tip: ${tip}`, CONTENT_W - 6);
+            doc.text(tLines, MARGIN + 3, y + 5);
+            y += tLines.length * 5 + 6;
           }
         });
       }
@@ -527,14 +537,28 @@ const TripResult = ({ tripData, onClose }) => {
                     <p className="day-description">{day.description}</p>
                   )}
 
-                  {/* Things To Do */}
-                  {day.thingsToDo?.length > 0 && (
+                  {/* Schedule (new format) */}
+                  {day.schedule?.length > 0 && (
+                    <div className="day-schedule">
+                      {day.schedule.map((item, i) => (
+                        <div key={i} className="schedule-item">
+                          <div className="schedule-time">{item.time}</div>
+                          <div className="schedule-body">
+                            <div className="schedule-activity">{item.activity}</div>
+                            {item.detail && <div className="schedule-detail">{item.detail}</div>}
+                            {item.cost && <div className="schedule-cost">💰 {item.cost}</div>}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* thingsToDo fallback */}
+                  {!day.schedule && day.thingsToDo?.length > 0 && (
                     <div className="day-section">
                       <div className="day-section-title">🗺️ Things To Do</div>
                       <ul className="things-list">
-                        {day.thingsToDo.map((item, i) => (
-                          <li key={i}>{item}</li>
-                        ))}
+                        {day.thingsToDo.map((item, i) => <li key={i}>{item}</li>)}
                       </ul>
                     </div>
                   )}
@@ -551,8 +575,8 @@ const TripResult = ({ tripData, onClose }) => {
                     </div>
                   )}
 
-                  {/* Fallback: old activities format */}
-                  {!day.thingsToDo && day.activities?.length > 0 && (
+                  {/* old activities fallback */}
+                  {!day.schedule && !day.thingsToDo && day.activities?.length > 0 && (
                     <div className="day-activities">
                       {day.activities.map((act, ai) => (
                         <div key={ai} className="activity-item-enhanced">
@@ -579,8 +603,8 @@ const TripResult = ({ tripData, onClose }) => {
                     {day.dailyCost && <span>💰 {day.dailyCost}</span>}
                   </div>
 
-                  {day.travelTip && (
-                    <div className="day-tip">💡 {day.travelTip}</div>
+                  {(day.travelTip || day.tip) && (
+                    <div className="day-tip">💡 {day.travelTip || day.tip}</div>
                   )}
                 </div>
               ))}
