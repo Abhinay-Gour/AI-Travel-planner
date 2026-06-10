@@ -2,9 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { generateTripPlan, generateTripSummary } from '../services/geminiService';
 import { sendTripPlanDirectly } from '../services/autoSendService';
 import { saveTrip } from '../services/authService';
+import { useToast } from '../context/ToastContext';
+import { sanitize } from '../services/secureStorage';
 import './TripPlannerForm.css';
 
 const TripPlannerForm = ({ initialDestination = '', onTripGenerated, onClose, user }) => {
+  const toast = useToast();
   const [formData, setFormData] = useState({
     destination: initialDestination,
     startDate: '',
@@ -20,84 +23,58 @@ const TripPlannerForm = ({ initialDestination = '', onTripGenerated, onClose, us
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    setFormData(prev => ({ ...prev, [name]: value }));
 
-    // Auto-calculate days when dates change
     if (name === 'startDate' || name === 'endDate') {
       const start = name === 'startDate' ? new Date(value) : new Date(formData.startDate);
       const end = name === 'endDate' ? new Date(value) : new Date(formData.endDate);
-      
       if (start && end && end > start) {
-        const diffTime = Math.abs(end - start);
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-        setFormData(prev => ({
-          ...prev,
-          days: diffDays.toString()
-        }));
+        const diffDays = Math.ceil(Math.abs(end - start) / (1000 * 60 * 60 * 24));
+        setFormData(prev => ({ ...prev, days: diffDays.toString() }));
       }
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    // Prevent multiple submissions
     if (loading) return;
-    
-    setLoading(true);
 
+    // Validate max days
+    if (parseInt(formData.days) > 30) {
+      toast('Maximum trip duration is 30 days', 'warning');
+      return;
+    }
+
+    setLoading(true);
     try {
-      console.log('🚀 Starting trip generation...');
-      
-      // Generate trip plan
       const tripPlan = await generateTripPlan(
-        formData.destination,
+        sanitize(formData.destination),
         formData.startDate,
         formData.endDate,
         formData.days,
-        formData.preferences
+        sanitize(formData.preferences)
       );
 
-      console.log('✅ Trip plan generated successfully');
-      
-      const tripSummary = generateTripSummary(tripPlan);
-      
       const completeData = {
         ...tripPlan,
-        userDetails: {
-          name: user.name,
-          email: user.email,
-          phone: user.phone
-        },
-        summary: tripSummary
+        userDetails: { name: user.name, email: user.email, phone: user.phone },
+        summary: generateTripSummary(tripPlan)
       };
 
-      // Show results to user first
       onTripGenerated(completeData);
 
-      // Save trip to backend in background
+      // Background tasks
       saveTrip({
         destination: formData.destination,
         startDate: formData.startDate,
         endDate: formData.endDate,
         ...tripPlan
-      }).then(saved => {
-        console.log('✅ Trip saved to DB:', saved?._id);
-      }).catch(err => {
-        console.error('❌ Trip save failed:', err);
-      });
-      
-      // Auto-send email + WhatsApp in background
-      sendTripPlanDirectly(user, completeData)
-        .then(r => console.log('✅ Auto-send:', r.success))
-        .catch(err => console.error('❌ Auto-send failed:', err));
-      
-    } catch (error) {
-      console.error('❌ Trip generation error:', error);
-      alert('Sorry, there was an error generating your trip plan. Please try again.');
+      }).catch(() => {});
+
+      sendTripPlanDirectly(user, completeData).catch(() => {});
+
+    } catch {
+      toast('Error generating trip plan. Please try again.', 'error');
     } finally {
       setLoading(false);
     }
@@ -110,11 +87,11 @@ const TripPlannerForm = ({ initialDestination = '', onTripGenerated, onClose, us
   };
 
   return (
-    <div className="trip-planner-overlay">
+    <div className="trip-planner-overlay" role="dialog" aria-modal="true" aria-label="Trip Planner">
       <div className="trip-planner-modal">
         <div className="modal-header">
           <h2>Plan Your Perfect Trip</h2>
-          <button className="close-btn" onClick={onClose}>×</button>
+          <button className="close-btn" onClick={onClose} aria-label="Close">×</button>
           <div className="user-info">
             <p>Planning for: <strong>{user.name}</strong></p>
           </div>
@@ -123,23 +100,27 @@ const TripPlannerForm = ({ initialDestination = '', onTripGenerated, onClose, us
         <form onSubmit={handleSubmit}>
           <div className="form-step">
             <h3>Trip Details</h3>
-            
+
             <div className="form-group">
-              <label>Destination *</label>
+              <label htmlFor="destination">Destination *</label>
               <input
+                id="destination"
                 type="text"
                 name="destination"
                 value={formData.destination}
                 onChange={handleInputChange}
                 placeholder="e.g. Paris, France"
+                maxLength={100}
                 required
+                autoComplete="off"
               />
             </div>
 
             <div className="form-row">
               <div className="form-group">
-                <label>Start Date *</label>
+                <label htmlFor="startDate">Start Date *</label>
                 <input
+                  id="startDate"
                   type="date"
                   name="startDate"
                   value={formData.startDate}
@@ -149,8 +130,9 @@ const TripPlannerForm = ({ initialDestination = '', onTripGenerated, onClose, us
                 />
               </div>
               <div className="form-group">
-                <label>End Date *</label>
+                <label htmlFor="endDate">End Date *</label>
                 <input
+                  id="endDate"
                   type="date"
                   name="endDate"
                   value={formData.endDate}
@@ -162,60 +144,59 @@ const TripPlannerForm = ({ initialDestination = '', onTripGenerated, onClose, us
             </div>
 
             <div className="form-group">
-              <label>Duration</label>
+              <label htmlFor="days">Duration</label>
               <input
+                id="days"
                 type="text"
                 name="days"
                 value={formData.days ? `${formData.days} days` : ''}
                 readOnly
                 placeholder="Auto-calculated"
+                aria-label="Trip duration in days"
               />
             </div>
 
             <div className="form-group">
-              <label>Preferences (Optional)</label>
+              <label htmlFor="preferences">Preferences (Optional)</label>
               <textarea
+                id="preferences"
                 name="preferences"
                 value={formData.preferences}
                 onChange={handleInputChange}
-                placeholder="e.g. Adventure activities, vegetarian food, budget travel, luxury hotels..."
+                placeholder="e.g. Adventure activities, vegetarian food, budget travel..."
                 rows="3"
+                maxLength={500}
               />
             </div>
 
-            <button 
-              type="submit" 
+            <button
+              type="submit"
               className="btn-generate"
               disabled={loading || !formData.destination || !formData.startDate || !formData.endDate}
+              aria-busy={loading}
             >
               {loading ? 'Generating & Auto-Sending...' : 'Generate My Trip 🚀'}
             </button>
-            
-            <div className="auto-send-info">
+
+            <div className="auto-send-info" aria-label="Auto-send information">
               <div className="auto-send-badge">
-                <span>🚀</span>
+                <span aria-hidden="true">🚀</span>
                 <div>
                   <strong>Auto-Send Enabled</strong>
                   <p>Trip details will be sent automatically to:</p>
                 </div>
               </div>
               <div className="send-targets">
-                <div className="send-target">
-                  <span>📧</span>
-                  <span>{user.email}</span>
-                </div>
-                <div className="send-target">
-                  <span>📱</span>
-                  <span>{user.phone}</span>
-                </div>
+                <div className="send-target"><span aria-hidden="true">📧</span><span>{user.email}</span></div>
+                <div className="send-target"><span aria-hidden="true">📱</span><span>{user.phone}</span></div>
               </div>
             </div>
           </div>
         </form>
 
         {loading && (
-          <div className="loading-overlay">
-            <div className="loading-spinner"></div>
+          <div className="loading-overlay" role="status" aria-live="polite">
+            <div className="loading-spinner" aria-hidden="true"></div>
             <p>AI is creating your perfect trip plan...</p>
             <p className="loading-sub">Will auto-send to your email & WhatsApp when ready!</p>
           </div>

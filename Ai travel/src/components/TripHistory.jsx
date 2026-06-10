@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { getMyTrips, deleteTrip, updateTrip } from '../services/authService';
+import { useToast } from '../context/ToastContext';
 import './TripHistory.css';
 
 const STATUS_COLORS = {
@@ -10,14 +11,16 @@ const STATUS_COLORS = {
   draft:     { bg: 'rgba(156,163,175,0.15)', color: '#9ca3af', label: '📝 Draft'      },
 };
 
-const TripCard = ({ trip, onDelete, onToggleFavorite, onView, onStatusChange }) => {
+const TripCard = ({ trip, onDelete, onToggleFavorite, onView, onStatusChange, toast }) => {
   const [deleting, setDeleting] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
   const status = STATUS_COLORS[trip.status] || STATUS_COLORS.planned;
 
   const handleDelete = async () => {
-    if (!window.confirm(`Delete trip to ${trip.destination}?`)) return;
+    if (!confirmDelete) { setConfirmDelete(true); setTimeout(() => setConfirmDelete(false), 3000); return; }
     setDeleting(true);
     await onDelete(trip._id);
+    toast(`Trip to ${trip.destination} deleted`, 'info');
     setDeleting(false);
   };
 
@@ -88,9 +91,9 @@ const TripCard = ({ trip, onDelete, onToggleFavorite, onView, onStatusChange }) 
           <button className="th-btn th-view-btn" onClick={() => onView(trip)}>
             👁️ View
           </button>
-          <button className="th-btn th-del-btn" onClick={handleDelete} disabled={deleting}>
-            {deleting ? '...' : '🗑️'}
-          </button>
+          <button className="th-btn th-del-btn" onClick={handleDelete} disabled={deleting} aria-label={confirmDelete ? 'Confirm delete' : 'Delete trip'}>
+              {deleting ? '...' : confirmDelete ? '⚠️ Sure?' : '🗑️'}
+            </button>
         </div>
       </div>
 
@@ -206,6 +209,7 @@ const TripDetailModal = ({ trip, onClose }) => {
 };
 
 const TripHistory = ({ onClose }) => {
+  const toast = useToast();
   const [trips, setTrips] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -326,6 +330,7 @@ const TripHistory = ({ onClose }) => {
                     onToggleFavorite={handleToggleFavorite}
                     onView={setViewTrip}
                     onStatusChange={handleStatusChange}
+                    toast={toast}
                   />
                 ))}
               </div>
