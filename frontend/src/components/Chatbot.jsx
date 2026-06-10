@@ -18,19 +18,27 @@ const QUICK_REPLIES = [
   '🚆 Train vs Flight vs Bus?',
 ];
 
-const INITIAL_MSG = {
+const INITIAL_MSG_EN = {
   id: 1,
   role: 'bot',
   text: "Hi! I'm your AI Travel Assistant ✈️\n\nAsk me anything about travel — destinations, budgets, visa info, packing tips, or let me plan your perfect trip!",
 };
 
+const INITIAL_MSG_HI = {
+  id: 1,
+  role: 'bot',
+  text: "Namaste! Main aapka AI Travel Assistant hoon ✈️\n\nKuch bhi poochho — destinations, budget, visa, packing tips, ya trip plan karwana ho — main hoon na!",
+};
+
 const Chatbot = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [lang, setLang] = useState(() => localStorage.getItem('chat_lang') || 'en');
+  const INITIAL_MSG = lang === 'hi' ? INITIAL_MSG_HI : INITIAL_MSG_EN;
   const [messages, setMessages] = useState(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
-      return saved ? JSON.parse(saved) : [INITIAL_MSG];
-    } catch { return [INITIAL_MSG]; }
+      return saved ? JSON.parse(saved) : [lang === 'hi' ? INITIAL_MSG_HI : INITIAL_MSG_EN];
+    } catch { return [lang === 'hi' ? INITIAL_MSG_HI : INITIAL_MSG_EN]; }
   });
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
@@ -52,8 +60,18 @@ const Chatbot = () => {
     }
   }, [messages, isOpen]);
 
+  const toggleLang = () => {
+    const newLang = lang === 'en' ? 'hi' : 'en';
+    setLang(newLang);
+    localStorage.setItem('chat_lang', newLang);
+    const initMsg = newLang === 'hi' ? INITIAL_MSG_HI : INITIAL_MSG_EN;
+    setMessages([initMsg]);
+    localStorage.removeItem(STORAGE_KEY);
+  };
+
   const clearChat = () => {
-    setMessages([INITIAL_MSG]);
+    const initMsg = lang === 'hi' ? INITIAL_MSG_HI : INITIAL_MSG_EN;
+    setMessages([initMsg]);
     localStorage.removeItem(STORAGE_KEY);
   };
 
@@ -109,6 +127,7 @@ const Chatbot = () => {
           .map(m => `${m.role === 'user' ? 'User' : 'Assistant'}: ${m.text}`)
           .join('\n');
 
+        const isHindi = lang === 'hi';
         const prompt = `You are TravelGPT — a world-class AI travel expert for Indians, built into the AI Travel Planner website.
 
 YOUR EXPERTISE:
@@ -138,7 +157,7 @@ KEY KNOWLEDGE:
 - Easy e-visa: Dubai, Malaysia, Vietnam, Turkey, Kenya
 
 RULES:
-- Reply in SAME language user uses (Hindi/English/Hinglish)
+- ${isHindi ? 'ALWAYS reply in Hindi (Devanagari script). Use simple conversational Hindi.' : 'ALWAYS reply in English only.'}
 - NEVER say I don't know — always give best answer
 - ONLY answer travel-related questions
 - Always give SPECIFIC real names — hotels, restaurants, places — never generic
@@ -211,6 +230,7 @@ Answer:`;
               <div className="chat-header-name">AI Travel Assistant</div>
               <div className="chat-header-status">Online — Ready to help</div>
             </div>
+            <button className="chat-lang-btn" onClick={toggleLang} title="Toggle language">{lang === 'en' ? '🇮🇳 HI' : '🇬🇧 EN'}</button>
             <button className="chat-clear" onClick={clearChat} title="Clear chat">🗑️</button>
             <button className="chat-close" onClick={() => setIsOpen(false)}>✕</button>
           </div>
