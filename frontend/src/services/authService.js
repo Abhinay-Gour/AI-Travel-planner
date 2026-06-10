@@ -37,8 +37,24 @@ api.interceptors.response.use(
   }
 );
 
+// Wake up Render server with retries
+const withRetry = async (fn, retries = 3, delay = 4000) => {
+  for (let i = 0; i < retries; i++) {
+    try {
+      return await fn();
+    } catch (err) {
+      const isServerSleep = err.code === 'ERR_NETWORK' || err.response?.status === 503 || err.response?.status === 502 || err.message?.includes('Network Error');
+      if (isServerSleep && i < retries - 1) {
+        await new Promise(r => setTimeout(r, delay));
+        continue;
+      }
+      throw err;
+    }
+  }
+};
+
 export const loginUser = async (email, password) => {
-  const { data } = await api.post('/auth/login', { email, password });
+  const { data } = await withRetry(() => api.post('/auth/login', { email, password }));
   localStorage.setItem('aiTravelToken', data.data.token);
   localStorage.setItem('aiTravelRefreshToken', data.data.refreshToken);
   localStorage.setItem('aiTravelUser', JSON.stringify(data.data.user));
@@ -46,7 +62,7 @@ export const loginUser = async (email, password) => {
 };
 
 export const signupUser = async (name, email, phone, password) => {
-  const { data } = await api.post('/auth/register', { name, email, phone, password });
+  const { data } = await withRetry(() => api.post('/auth/register', { name, email, phone, password }));
   localStorage.setItem('aiTravelToken', data.data.token);
   localStorage.setItem('aiTravelRefreshToken', data.data.refreshToken);
   localStorage.setItem('aiTravelUser', JSON.stringify(data.data.user));

@@ -102,7 +102,8 @@ const Navbar = () => {
 
       // Handle Render cold start
       if (msg.includes('Network') || msg.includes('ECONNREFUSED') || err.code === 'ERR_NETWORK') {
-        setAuthError('Server is starting up (free tier). Please wait 30 seconds and try again.');
+        setAuthError('⏳ Server is waking up (free tier). Auto-retrying in 5 seconds...');
+        setTimeout(() => handleSubmit(e), 5000);
       } else {
         setAuthError(msg);
       }
