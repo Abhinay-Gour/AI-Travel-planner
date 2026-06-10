@@ -54,71 +54,80 @@ export const generateTripPlan = async (destination, startDate, endDate, days, pr
     }
 
     const refData = buildReferencePrompt(destination);
+    console.log('📍 Reference data found:', refData ? 'YES' : 'NO - will use Gemini knowledge');
+    console.log('📍 Destination input:', destination);
 
-    const prompt = `You are an expert travel planner with deep knowledge of real places worldwide. Create a detailed ${days}-day trip itinerary for ${destination}.
+    const prompt = `You are an expert travel planner. Create a ${days}-day itinerary for ${destination}.
+
+CRITICAL: Return ONLY raw JSON. No markdown, no explanation, no code blocks.
 
 STRICT RULES:
-1. ALL place names must be 100% real and specific — NEVER use "Local Restaurant", "Tourist Area", "Famous Attraction", "City Center", "Popular Cafe", "Nearby Market"
-2. Use ONLY actual named restaurants, hotels, landmarks from the reference data provided below
-3. If reference data is provided, strictly use those exact names
-4. Write in English only
-5. Each day has a time-based schedule: morning, lunch at named place, afternoon, evening, dinner at named place
-6. Day 1 must start with arrival at the real airport name
-7. Last day must end with departure from real airport
-8. Hotel must be a real named property
-${refData}
+- NEVER use generic names like "Local Restaurant", "Tourist Area", "Popular Eatery", "Nearby Market", "Well-known restaurant", "Famous Attraction", "City Center"
+- Use ONLY real specific names: actual restaurant names, real hotel names, real landmark names
+- Day 1: start with arrival at real airport name
+- Last day: end with departure
+- Hotel must be a real named hotel
+${refData ? refData : `- Use your knowledge of real places in ${destination} — real hotels, restaurants, landmarks`}
 
-Return ONLY valid JSON, no markdown:
-
+JSON FORMAT (generate all ${days} days):
 {
   "destination": "${destination}",
   "duration": "${days} days",
   "dates": "${startDate} to ${endDate}",
   "overview": "2-3 sentences about ${destination}",
-  "highlights": ["real place 1", "real place 2", "real place 3", "real place 4", "real place 5"],
+  "highlights": ["place1", "place2", "place3", "place4", "place5"],
   "dailyItinerary": [
     {
       "day": 1,
       "date": "${startDate}",
-      "title": "Arrival in [City]",
+      "title": "Arrival in ${destination}",
       "schedule": [
-        { "time": "10:00 AM", "activity": "Arrive at [REAL AIRPORT NAME]", "detail": "Take a prepaid cab to hotel. Journey takes about 30 minutes.", "cost": "₹600" },
-        { "time": "12:00 PM", "activity": "Lunch at [REAL RESTAURANT NAME]", "detail": "Try [specific real dish name]. This restaurant is known for authentic local cuisine.", "cost": "₹400-700 per person" },
-        { "time": "02:00 PM", "activity": "Visit [REAL PLACE NAME]", "detail": "[What to see and do there specifically]", "cost": "₹50-200 entry" },
-        { "time": "05:00 PM", "activity": "[REAL EVENING PLACE/ACTIVITY]", "detail": "[Specific experience]", "cost": "₹200-500" },
-        { "time": "08:00 PM", "activity": "Dinner at [REAL RESTAURANT NAME]", "detail": "Must try [specific dish]. [Why this restaurant is special]", "cost": "₹500-900 per person" }
+        { "time": "10:00 AM", "activity": "Arrive at [REAL AIRPORT NAME]", "detail": "Check in to hotel, freshen up.", "cost": "\u20b9600" },
+        { "time": "01:00 PM", "activity": "Lunch at [REAL RESTAURANT NAME]", "detail": "Try [real dish name].", "cost": "\u20b9400-700" },
+        { "time": "03:00 PM", "activity": "Visit [REAL PLACE NAME]", "detail": "[what to see/do there]", "cost": "\u20b9100-300" },
+        { "time": "06:00 PM", "activity": "[REAL EVENING SPOT]", "detail": "[experience]", "cost": "\u20b9200" },
+        { "time": "08:00 PM", "activity": "Dinner at [REAL RESTAURANT]", "detail": "Try [real dish].", "cost": "\u20b9500-900" }
       ],
-      "hotel": "[REAL HOTEL NAME], [area/location]",
-      "dailyCost": "₹4000-8000 per person",
-      "tip": "[One specific practical tip for this day]"
+      "hotel": "[REAL HOTEL NAME], [area]",
+      "dailyCost": "\u20b94000-8000",
+      "tip": "[practical tip for this day]"
     }
   ],
-  "mustEat": ["Dish 1 — where to try it", "Dish 2 — where to try it", "Dish 3", "Dish 4", "Dish 5"],
-  "mustBuy": ["Item 1 — where to buy", "Item 2 — where to buy", "Item 3", "Item 4"],
+  "mustEat": ["dish1 at restaurant1", "dish2", "dish3", "dish4", "dish5"],
+  "mustBuy": ["item1 from market1", "item2", "item3"],
   "budgetEstimate": {
-    "accommodation": "₹2000-8000 per night",
-    "food": "₹1200-3000 per day",
-    "activities": "₹3000-12000 total",
-    "transportation": "₹2000-6000 total",
-    "shopping": "₹2000-10000 (optional)",
-    "total": "₹${Math.round(parseInt(days) * 4000)}-₹${Math.round(parseInt(days) * 12000)} for entire trip"
+    "accommodation": "\u20b92000-8000/night",
+    "food": "\u20b91200-3000/day",
+    "activities": "\u20b93000-12000 total",
+    "transportation": "\u20b92000-6000 total",
+    "total": "\u20b9${Math.round(parseInt(days) * 4000)}-\u20b9${Math.round(parseInt(days) * 12000)}"
   },
-  "travelTips": ["tip 1", "tip 2", "tip 3", "tip 4", "tip 5"],
-  "bestTimeToVisit": "[specific months and reason]",
-  "emergencyNumbers": "Police: 100, Ambulance: 108, Tourist Helpline: 1800-111-363"
+  "travelTips": ["tip1", "tip2", "tip3"],
+  "bestTimeToVisit": "[months and reason]",
+  "emergencyNumbers": "Police: 100, Ambulance: 108"
 }
 
-Generate ALL ${days} days in dailyItinerary. Every schedule item must use a REAL named place. No generic names allowed.
-User preferences: ${preferences || 'standard comfortable travel'}`;
+User preferences: ${preferences || 'standard comfortable travel'}
+Generate ALL ${days} days. Every place name must be REAL and SPECIFIC.`;
 
     const result = await model.generateContent(prompt);
     const text = result.response.text();
+    console.log('🔍 Gemini raw response:', text.substring(0, 300));
 
-    // Parse JSON from response
-    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    // Parse JSON — strip markdown if present
+    const clean = text.replace(/```json|```/g, '').trim();
+    const jsonMatch = clean.match(/\{[\s\S]*\}/);
     if (!jsonMatch) throw new Error('No JSON in response');
 
-    const parsed = JSON.parse(jsonMatch[0]);
+    let parsed;
+    try {
+      parsed = JSON.parse(jsonMatch[0]);
+    } catch (parseErr) {
+      console.error('JSON parse error:', parseErr);
+      // Try to fix common JSON issues
+      const fixed = jsonMatch[0].replace(/,\s*}/g, '}').replace(/,\s*]/g, ']');
+      parsed = JSON.parse(fixed);
+    }
 
     // Add images
     const img = getDestImage(destination);
@@ -128,7 +137,8 @@ User preferences: ${preferences || 'standard comfortable travel'}`;
     return parsed;
 
   } catch (error) {
-    console.error('Trip generation error:', error);
+    console.error('Trip generation error:', error.message || error);
+    console.error('Full error:', error);
     return createFallbackResponse(destination, startDate, endDate, days);
   }
 };
