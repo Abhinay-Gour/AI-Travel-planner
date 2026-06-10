@@ -1,4 +1,5 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import { fetchRealPlaces, buildLocationAwarePrompt } from './locationsService';
 
 const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
 
@@ -53,56 +54,13 @@ export const generateTripPlan = async (destination, startDate, endDate, days, pr
       model = genAI.getGenerativeModel({ model: 'gemini-pro' });
     }
 
-    const prompt = `Create a detailed ${days}-day travel itinerary for ${destination} from ${startDate} to ${endDate}.
+    // Fetch real locations first
+    log('Fetching real locations for:', destination);
+    const realPlaces = await fetchRealPlaces(destination, 15);
+    log(`Found ${realPlaces.length} real places`);
 
-IMPORTANT: Include REAL, FAMOUS, and SPECIFIC locations with detailed descriptions.
-
-Destination: ${destination}
-Duration: ${days} days
-Dates: ${startDate} to ${endDate}
-
-Overview: [Brief 2-3 sentence overview]
-
-Highlights:
-- [Real famous landmark 1]
-- [Real famous landmark 2]
-- [Real famous landmark 3]
-- [Real famous landmark 4]
-
-Daily Itinerary:
-
-Day 1 (${startDate}) - Arrival & City Center Exploration
-- 09:00 AM: [Activity] ($cost)
-  Location: [Real address]
-  Why Visit: [Description]
-- 02:00 PM: [Activity] ($cost)
-- 07:00 PM: Dinner at [Restaurant area] ($cost)
-Meals: [breakfast, lunch, dinner]
-Accommodation: [Hotel area]
-
-[Continue for all ${days} days]
-
-Budget Estimate:
-- Accommodation: $80-150 per night
-- Food: $40-80 per day
-- Activities: $200-400 total
-- Transportation: $100-200 total
-- Total: $800-1500 for entire trip
-
-Travel Tips:
-- [Tip 1]
-- [Tip 2]
-- [Tip 3]
-
-Packing List:
-- [Item 1]
-- [Item 2]
-
-Best Time to Visit: [Info]
-Local Currency: [Currency]
-Language: [Language]
-
-Additional preferences: ${preferences || 'Standard travel experience with authentic local experiences'}`;
+    // Build location-aware prompt
+    const prompt = buildLocationAwarePrompt(destination, days, startDate, endDate, preferences, realPlaces);
 
     log('Generating trip plan for:', destination);
     const result = await model.generateContent(prompt);
@@ -110,6 +68,8 @@ Additional preferences: ${preferences || 'Standard travel experience with authen
     log('AI Response received successfully');
 
     const parsedData = parseTextResponseWithLocations(text, destination, startDate, endDate, days);
+    // Attach real places data
+    parsedData.realPlaces = realPlaces;
     log('✅ Trip plan generated successfully!');
     return parsedData;
 

@@ -12,6 +12,7 @@ import userRoutes from './routes/users.js';
 import emailRoutes from './routes/email.js';
 import weatherRoutes from './routes/weather.js';
 import paymentRoutes from './routes/payment.js';
+import locationRoutes from './routes/locations.js';
 
 dotenv.config();
 
@@ -71,6 +72,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/email', emailRoutes);
 app.use('/api/weather', weatherRoutes);
 app.use('/api/payment', paymentRoutes);
+app.use('/api/locations', locationRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {

@@ -1,4 +1,5 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import { buildReferencePrompt } from './destinationsData';
 
 const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
 const genAI = new GoogleGenerativeAI(API_KEY);
@@ -52,23 +53,20 @@ export const generateTripPlan = async (destination, startDate, endDate, days, pr
       model = genAI.getGenerativeModel({ model: 'gemini-pro' });
     }
 
-    const prompt = `You are an expert travel planner. Create a detailed ${days}-day trip itinerary for ${destination}.
+    const refData = buildReferencePrompt(destination);
+
+    const prompt = `You are an expert travel planner with deep knowledge of real places worldwide. Create a detailed ${days}-day trip itinerary for ${destination}.
 
 STRICT RULES:
-1. ALL place names must be 100% real and specific — NO generic names like "Local Restaurant", "Tourist Area", "Famous Attraction", "City Center"
-2. Use actual named restaurants, hotels, landmarks, markets
-3. Write in English only
-4. Each day has a narrative schedule: morning activity, lunch at named place, afternoon activity, dinner at named place
-5. Day 1 must start with arrival at the real airport name
-6. Last day must end with departure from real airport
-
-KASHMIR REFERENCE (use these exact names):
-- Airport: Sheikh ul-Alam International Airport, Srinagar
-- Hotels: The Lalit Grand Palace, Vivanta Dal View, Houseboat on Dal Lake, Hotel Broadway, Grand Mumtaz Resort
-- Restaurants: Ahdoos Restaurant, Mughal Darbar, Shamyana Restaurant, Lhasa Restaurant, Adhoos
-- Places: Dal Lake, Nagin Lake, Shalimar Bagh, Nishat Bagh, Chashme Shahi, Shankaracharya Temple, Hazratbal Mosque, Lal Chowk, Polo View Market, Boulevard Road, Pari Mahal, Dachigam National Park, Gulmarg, Gondola Cable Car, Apharwat Peak, Pahalgam, Betaab Valley, Aru Valley, Lidder River, Baisaran Valley, Sonamarg, Thajiwas Glacier, Zero Point
-- Food: Rogan Josh, Wazwan, Gushtaba, Yakhni, Dum Aloo Kashmiri, Kashmiri Kahwa, Sheer Chai, Modur Pulao
-- Shopping: Pashmina shawls, Kashmiri saffron, dry fruits, walnut wood handicrafts, Kashmiri carpets, papier-mache items from Lal Chowk or Polo View Market
+1. ALL place names must be 100% real and specific — NEVER use "Local Restaurant", "Tourist Area", "Famous Attraction", "City Center", "Popular Cafe", "Nearby Market"
+2. Use ONLY actual named restaurants, hotels, landmarks from the reference data provided below
+3. If reference data is provided, strictly use those exact names
+4. Write in English only
+5. Each day has a time-based schedule: morning, lunch at named place, afternoon, evening, dinner at named place
+6. Day 1 must start with arrival at the real airport name
+7. Last day must end with departure from real airport
+8. Hotel must be a real named property
+${refData}
 
 Return ONLY valid JSON, no markdown:
 

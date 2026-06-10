@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { generateTripPlan, generateTripSummary } from '../services/geminiService';
 import { sendTripPlanDirectly } from '../services/autoSendService';
 import { saveTrip } from '../services/authService';
@@ -8,6 +8,8 @@ import './TripPlannerForm.css';
 
 const TripPlannerForm = ({ initialDestination = '', onTripGenerated, onClose, user }) => {
   const toast = useToast();
+  const destInputRef = useRef(null);
+  const autocompleteRef = useRef(null);
   const [formData, setFormData] = useState({
     destination: initialDestination,
     startDate: '',
@@ -20,6 +22,22 @@ const TripPlannerForm = ({ initialDestination = '', onTripGenerated, onClose, us
   useEffect(() => {
     setFormData(prev => ({ ...prev, destination: initialDestination }));
   }, [initialDestination]);
+
+  // Google Places Autocomplete
+  useEffect(() => {
+    if (!destInputRef.current || !window.google?.maps?.places) return;
+    const autocomplete = new window.google.maps.places.Autocomplete(destInputRef.current, {
+      types: ['(cities)'],
+      fields: ['name', 'formatted_address'],
+    });
+    autocomplete.addListener('place_changed', () => {
+      const place = autocomplete.getPlace();
+      const name = place.formatted_address || place.name || '';
+      setFormData(prev => ({ ...prev, destination: name }));
+    });
+    autocompleteRef.current = autocomplete;
+    return () => window.google?.maps?.event?.clearInstanceListeners(autocomplete);
+  }, []);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;

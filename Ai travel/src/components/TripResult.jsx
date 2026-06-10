@@ -252,12 +252,18 @@ const TripResult = ({ tripData, onClose }) => {
     }
   };
 
-  const getMapsUrl = (dest) =>
-    `https://www.google.com/maps/search/${encodeURIComponent(dest)}`;
+  const MAPS_KEY = import.meta.env.VITE_GOOGLE_MAPS_KEY;
+  const heroImg = getDestImage(tripData.destination);
+  const realPlaces = tripData.realPlaces?.length > 0 ? tripData.realPlaces : getRealPlaces(tripData.destination);
+  const allDays = tripData.dailyItinerary || [];
+  const visibleDays = expandedDays ? allDays : allDays.slice(0, 3);
+  const galleryImages = realPlaces ? realPlaces.map(p => ({ src: p.photo || p.img, caption: p.name })).filter(g => g.src) : [];
 
-  const getMapsEmbed = (dest) =>
-    `https://maps.google.com/maps?q=${encodeURIComponent(dest)}&output=embed&z=11`;
-
+  const getMapsUrl = (dest) => `https://www.google.com/maps/search/${encodeURIComponent(dest)}`;
+  const getMapsEmbed = (dest) => MAPS_KEY
+    ? `https://www.google.com/maps/embed/v1/place?key=${MAPS_KEY}&q=${encodeURIComponent(dest)}&zoom=12`
+    : `https://maps.google.com/maps?q=${encodeURIComponent(dest)}&output=embed&z=11`;
+  const getPlaceMapsUrl = (place, dest) => place.mapsUrl || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(place.name + ' ' + dest)}`;
   return (
     <div className="trip-result-overlay">
       <div className="trip-result-modal">
@@ -338,7 +344,7 @@ const TripResult = ({ tripData, onClose }) => {
                   <div className="real-place-info">
                     <h5>{place.name}</h5>
                     <p>{place.desc}</p>
-                    <a href={`https://www.google.com/maps/search/${encodeURIComponent(place.name + ' ' + tripData.destination)}`} target="_blank" rel="noopener noreferrer" className="place-maps-link">📍 View on Maps</a>
+                    <a href={getPlaceMapsUrl(place.name, tripData.destination)} target="_blank" rel="noopener noreferrer" className="place-maps-link">📍 View on Maps</a>
                   </div>
                 </div>
               ))}
@@ -393,7 +399,7 @@ const TripResult = ({ tripData, onClose }) => {
                           <h5 className="activity-name">{act.activity}</h5>
                           <p className="activity-description">{act.description}</p>
                           <div className="activity-location">
-                            <a href={`https://www.google.com/maps/search/${encodeURIComponent(act.location)}`} target="_blank" rel="noopener noreferrer">📍 {act.location}</a>
+                    <a href={getPlaceMapsUrl(act.location, tripData.destination)} target="_blank" rel="noopener noreferrer">📍 {act.location}</a>
                             <span>⏱️ {act.duration}</span>
                           </div>
                         </div>
