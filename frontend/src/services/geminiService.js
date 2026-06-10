@@ -148,48 +148,33 @@ const createFallbackResponse = (destination, startDate, endDate, days) => {
       title: i === 0 ? 'Arrival & First Exploration'
         : i === daysNum - 1 ? 'Final Day & Departure'
         : `Day ${i + 1} — Exploring ${destination}`,
-      activities: [
+      schedule: [
         {
           time: '09:00 AM',
-          activity: i === 0 ? `Arrive at ${destination} Airport` : `Morning at ${destination}`,
-          description: i === 0
-            ? `Land at airport, take taxi/metro to hotel in city center`
-            : `Start your day exploring the best of ${destination}`,
-          location: i === 0 ? `${destination} International Airport` : `${destination} City Center`,
-          duration: '2 hours',
-          cost: i === 0 ? '₹800 (taxi)' : '₹0',
+          activity: i === 0 ? `Arrive at ${destination} Airport` : `Morning sightseeing in ${destination}`,
+          detail: i === 0 ? `Take a prepaid taxi to your hotel` : `Explore the local area and markets`,
+          cost: i === 0 ? '₹800' : '₹0',
         },
         {
-          time: '12:00 PM',
-          activity: `Lunch — Local ${destination} Cuisine`,
-          description: `Try authentic local food and specialties of ${destination}`,
-          location: `Local restaurant in ${destination}`,
-          duration: '1 hour',
-          cost: '₹500-800',
+          time: '12:30 PM',
+          activity: `Lunch at a popular local eatery`,
+          detail: `Try regional specialties of ${destination}`,
+          cost: '₹400-800',
         },
         {
           time: '02:00 PM',
-          activity: `Visit Famous Attractions of ${destination}`,
-          description: `Explore the most iconic landmarks and attractions`,
-          location: `${destination} Tourist Area`,
-          duration: '3 hours',
-          cost: '₹500-1500',
+          activity: `Visit main attractions of ${destination}`,
+          detail: `Explore the iconic sights and cultural spots`,
+          cost: '₹200-1000',
         },
         {
-          time: '07:00 PM',
-          activity: `Dinner & Evening in ${destination}`,
-          description: `Enjoy local dinner and evening atmosphere`,
-          location: `${destination} Restaurant District`,
-          duration: '2 hours',
-          cost: '₹600-1200',
+          time: '07:30 PM',
+          activity: `Dinner at a well-known restaurant`,
+          detail: `Enjoy the local cuisine and flavours`,
+          cost: '₹500-1200',
         },
       ],
-      meals: {
-        breakfast: 'Hotel breakfast',
-        lunch: `Local ${destination} restaurant`,
-        dinner: `${destination} dining area`,
-      },
-      accommodation: `Hotel in ${destination} city center`,
+      hotel: `A comfortable hotel in ${destination}`,
       dailyCost: '₹4000-8000',
     };
   });

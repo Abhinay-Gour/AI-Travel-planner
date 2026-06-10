@@ -325,6 +325,10 @@
   font-family: 'Inter', sans-serif; font-size: 0.875rem; font-weight: 700;
   cursor: pointer; transition: all 0.2s; border: none; text-align: center;
 }
+.share-btn.save { background: rgba(99,102,241,0.15); border: 1px solid rgba(99,102,241,0.3); color: #a5b4fc; }
+.share-btn.save:hover { background: rgba(99,102,241,0.25); color: #fff; }
+.share-btn.copy { background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.25); color: #34d399; }
+.share-btn.copy:hover { background: rgba(16,185,129,0.2); color: #fff; }
 .share-btn.whatsapp { background: #25D366; color: white; }
 .share-btn.whatsapp:hover { background: #1da851; }
 .share-btn.download { background: linear-gradient(135deg, var(--rose), var(--deep)); color: white; box-shadow: 0 4px 14px var(--glow-rose); }
@@ -352,7 +356,7 @@
   .itinerary-preview, .gallery-section { padding: 14px 12px; }
   .budget-grid { grid-template-columns: 1fr; gap: 7px; }
   .budget-item { padding: 8px 10px; }
-  .action-buttons { grid-template-columns: 1fr; gap: 8px; }
+  .action-buttons { grid-template-columns: 1fr 1fr; gap: 8px; }
   .share-btn { padding: 13px; font-size: 0.9rem; }
   .user-details { flex-direction: column; gap: 5px; }
   .highlights-grid { grid-template-columns: 1fr; }

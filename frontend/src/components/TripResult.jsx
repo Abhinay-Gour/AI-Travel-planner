@@ -135,7 +135,34 @@ const TripResult = ({ tripData, onClose }) => {
   const [expandedDays, setExpandedDays] = useState(false);
   const [galleryIdx, setGalleryIdx] = useState(null);
   const [pdfLoading, setPdfLoading] = useState(false);
+  const [copied, setCopied] = useState(false);
   const toast = useToast();
+
+  const copyItinerary = () => {
+    const text = (tripData.dailyItinerary || []).map(day =>
+      `Day ${day.day} — ${day.title}\n` +
+      (day.schedule?.map(s => `  ${s.time}: ${s.activity}`).join('\n') || '') +
+      (day.hotel ? `\n  🏨 ${day.hotel}` : '') +
+      (day.tip ? `\n  💡 ${day.tip}` : '')
+    ).join('\n\n');
+    navigator.clipboard.writeText(`${tripData.destination} — ${tripData.duration}\n${tripData.dates}\n\n${text}`);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+    toast('Itinerary copied!', 'success');
+  };
+
+  // Save trip to localStorage history
+  const saveTrip = () => {
+    const history = JSON.parse(localStorage.getItem('tripHistory') || '[]');
+    const exists = history.find(t => t.destination === tripData.destination && t.dates === tripData.dates);
+    if (!exists) {
+      history.unshift({ ...tripData, savedAt: new Date().toISOString() });
+      localStorage.setItem('tripHistory', JSON.stringify(history.slice(0, 20)));
+      toast('Trip saved to history! ✅', 'success');
+    } else {
+      toast('Trip already saved!', 'info');
+    }
+  };
   const heroImg = getDestImage(tripData.destination);
   const realPlaces = getRealPlaces(tripData.destination);
   const allDays = tripData.dailyItinerary || [];
@@ -464,13 +491,13 @@ const TripResult = ({ tripData, onClose }) => {
         {/* Lightbox */}
         {galleryIdx !== null && (
           <div className="lightbox" onClick={() => setGalleryIdx(null)}>
-            <button className="lb-prev" onClick={e => { e.stopPropagation(); setGalleryIdx(i => (i - 1 + galleryImages.length) % galleryImages.length); }}>‹</button>
+            <button className="lb-prev" onClick={e => { e.stopPropagation(); setGalleryIdx(idx => (idx - 1 + galleryImages.length) % galleryImages.length); }}>‹</button>
             <div className="lb-content" onClick={e => e.stopPropagation()}>
               <img src={galleryImages[galleryIdx].src} alt={galleryImages[galleryIdx].caption} />
               <div className="lb-caption">{galleryImages[galleryIdx].caption}</div>
               <div className="lb-counter">{galleryIdx + 1} / {galleryImages.length}</div>
             </div>
-            <button className="lb-next" onClick={e => { e.stopPropagation(); setGalleryIdx(i => (i + 1) % galleryImages.length); }}>›</button>
+            <button className="lb-next" onClick={e => { e.stopPropagation(); setGalleryIdx(idx => (idx + 1) % galleryImages.length); }}>›</button>
             <button className="lb-close" onClick={() => setGalleryIdx(null)}>✕</button>
           </div>
         )}
@@ -644,15 +671,19 @@ const TripResult = ({ tripData, onClose }) => {
 
         <TripShareLink tripData={tripData} />
 
-        <div className="user-info">
-          <h4>👤 Trip Details For:</h4>
-          <div className="user-details">
-            <span>📧 {tripData.userDetails?.email}</span>
-            <span>📱 {tripData.userDetails?.phone}</span>
+        {(tripData.userDetails?.email || tripData.userDetails?.phone) && (
+          <div className="user-info">
+            <h4>👤 Trip Details For:</h4>
+            <div className="user-details">
+              {tripData.userDetails?.email && <span>📧 {tripData.userDetails.email}</span>}
+              {tripData.userDetails?.phone && <span>📱 {tripData.userDetails.phone}</span>}
+            </div>
           </div>
-        </div>
+        )}
 
         <div className="action-buttons">
+          <button className="share-btn save" onClick={saveTrip}>💾 Save Trip</button>
+          <button className="share-btn copy" onClick={copyItinerary}>{copied ? '✅ Copied!' : '📋 Copy Itinerary'}</button>
           <button className="share-btn whatsapp" onClick={shareOnWhatsApp}>📱 Share on WhatsApp</button>
           <button className="share-btn download" onClick={downloadPDF} disabled={pdfLoading}>
             {pdfLoading ? '⏳ Generating PDF...' : '📄 Download PDF'}
