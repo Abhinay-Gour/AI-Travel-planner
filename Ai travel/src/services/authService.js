@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { secureStorage, sanitize } from './secureStorage';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
 
@@ -38,17 +39,27 @@ api.interceptors.response.use(
 );
 
 export const loginUser = async (email, password) => {
-  const { data } = await api.post('/auth/login', { email, password });
+  const { data } = await api.post('/auth/login', {
+    email: sanitize(email),
+    password
+  });
   localStorage.setItem('aiTravelToken', data.data.token);
   localStorage.setItem('aiTravelRefreshToken', data.data.refreshToken);
+  secureStorage.set('user', data.data.user);
   localStorage.setItem('aiTravelUser', JSON.stringify(data.data.user));
   return data.data.user;
 };
 
 export const signupUser = async (name, email, phone, password) => {
-  const { data } = await api.post('/auth/register', { name, email, phone, password });
+  const { data } = await api.post('/auth/register', {
+    name: sanitize(name),
+    email: sanitize(email),
+    phone: sanitize(phone),
+    password
+  });
   localStorage.setItem('aiTravelToken', data.data.token);
   localStorage.setItem('aiTravelRefreshToken', data.data.refreshToken);
+  secureStorage.set('user', data.data.user);
   localStorage.setItem('aiTravelUser', JSON.stringify(data.data.user));
   return data.data.user;
 };
@@ -57,6 +68,7 @@ export const logoutUser = () => {
   localStorage.removeItem('aiTravelToken');
   localStorage.removeItem('aiTravelRefreshToken');
   localStorage.removeItem('aiTravelUser');
+  secureStorage.remove('user');
 };
 
 export const getProfile = async () => {

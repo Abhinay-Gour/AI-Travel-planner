@@ -14,10 +14,8 @@ const Hero = () => {
   const [showForm, setShowForm] = useState(false);
   const [tripData, setTripData] = useState(null);
   const [destination, setDestination] = useState('');
-  const [showAuthWarning, setShowAuthWarning] = useState(false);
   const [pendingPlanTrip, setPendingPlanTrip] = useState(false);
 
-  // Listen for destination selection from GlobeDashboard
   useEffect(() => {
     const handler = (e) => {
       setDestination(e.detail);
@@ -28,7 +26,6 @@ const Hero = () => {
     return () => window.removeEventListener('selectDestination', handler);
   }, [isAuthenticated]);
 
-  // Auto-show form after login if user clicked "Login to Plan"
   useEffect(() => {
     if (isAuthenticated && pendingPlanTrip && destination.trim()) {
       setShowForm(true);
@@ -38,41 +35,17 @@ const Hero = () => {
 
   const handlePlanTrip = (e) => {
     e.preventDefault();
-    
     if (!isAuthenticated) {
-      if (destination.trim()) {
-        setPendingPlanTrip(true);
-        openAuth('login');
-      } else {
-        toast('Please enter a destination first', 'warning');
-      }
+      if (destination.trim()) { setPendingPlanTrip(true); openAuth('login'); }
+      else toast('Please enter a destination first', 'warning');
       return;
     }
-    if (destination.trim()) {
-      setShowForm(true);
-    } else {
-      toast('Please enter a destination', 'warning');
-    }
-  };
-
-  const handleTripGenerated = (data) => {
-    setTripData(data);
-    setShowForm(false);
-  };
-
-  const handleCloseResult = () => {
-    setTripData(null);
-    setDestination('');
+    if (destination.trim()) setShowForm(true);
+    else toast('Please enter a destination', 'warning');
   };
 
   const handleQuickDestination = (dest) => {
-    if (!isAuthenticated) {
-      setDestination(dest);
-      setPendingPlanTrip(true);
-      openAuth('login'); // Open login modal
-      return;
-    }
-    
+    if (!isAuthenticated) { setDestination(dest); setPendingPlanTrip(true); openAuth('login'); return; }
     setDestination(dest);
     setShowForm(true);
   };
@@ -80,97 +53,93 @@ const Hero = () => {
   return (
     <>
       <section className="hero">
-        <div className="hero-bg"></div>
+        <div className="hero-bg" aria-hidden="true"></div>
         <div className="hero-wrapper">
           <div className="hero-content">
             <div className="hero-badge">
-              <span className="dot"></span>
+              <span className="dot" aria-hidden="true"></span>
               AI-Powered Travel Planning
             </div>
             <h1>
               Plan Your <em>Perfect</em> Trip with <span className="highlight">AI Magic</span>
             </h1>
             <p className="hero-sub">
-              AI Travel Planner creates personalized day-by-day itineraries in seconds. 
+              AI Travel Planner creates personalized day-by-day itineraries in seconds.
               Enter your destination, set your dates, and let AI build your dream journey.
             </p>
-            
-            {/* Auth Warning */}
-            {showAuthWarning && (
-              <div className="auth-warning">
-                <p>⚠️ Please login or signup first to plan your trip!</p>
-              </div>
-            )}
-            
-            <form className="hero-form" onSubmit={handlePlanTrip}>
+
+            <form className="hero-form" onSubmit={handlePlanTrip} role="search">
               <input
                 type="text"
                 placeholder="Where do you want to go? e.g. Paris, Bali, Tokyo..."
                 value={destination}
-                onChange={(e) => setDestination(e.target.value)}
+                onChange={(e) => setDestination(e.target.value.slice(0, 100))}
+                aria-label="Enter destination"
+                autoComplete="off"
               />
-              <button type="submit">
+              <button type="submit" aria-label={isAuthenticated ? 'Plan my trip' : 'Login to plan trip'}>
                 {isAuthenticated ? 'Plan My Trip ♥' : 'Login to Plan ♥'}
               </button>
             </form>
-            
-            {/* Quick destination cards */}
-            <div className="hero-stats">
+
+            <div className="hero-stats" aria-label="Platform statistics">
               <span>No credit card required</span>
               <span>50,000+ trips planned</span>
               <span>4.8/5 user rating</span>
             </div>
-            <MoodQuiz onSelectDestination={(dest) => { setDestination(dest); if (isAuthenticated) setShowForm(true); else { setPendingPlanTrip(true); openAuth('login'); } }} />
-            
+
+            <MoodQuiz onSelectDestination={(dest) => {
+              setDestination(dest);
+              if (isAuthenticated) setShowForm(true);
+              else { setPendingPlanTrip(true); openAuth('login'); }
+            }} />
+
             {isAuthenticated && (
               <div className="user-welcome">
                 <p>Welcome back, {user?.name}! Ready to plan your next adventure? ✈️</p>
               </div>
             )}
           </div>
-          
-          <div className="floating-cards">
-            <div className="trip-card" onClick={() => handleQuickDestination('Paris, France')}>
-              <div className="flag">🗼</div>
-              <h4>Paris, France</h4>
-              <p>Art, romance & cuisine</p>
-              <div className="days">7 Day Plan Ready</div>
-            </div>
-            <div className="trip-card" onClick={() => handleQuickDestination('Bali, Indonesia')}>
-              <div className="flag">🌺</div>
-              <h4>Bali, Indonesia</h4>
-              <p>Temples & beaches</p>
-              <div className="days">5 Day Plan Ready</div>
-            </div>
-            <div className="trip-card" onClick={() => handleQuickDestination('Tokyo, Japan')}>
-              <div className="flag">🗻</div>
-              <h4>Tokyo, Japan</h4>
-              <p>Culture & street food</p>
-              <div className="days">10 Day Plan Ready</div>
-            </div>
-            <div className="trip-card" onClick={() => handleQuickDestination('Rome, Italy')}>
-              <div className="flag">🏛️</div>
-              <h4>Rome, Italy</h4>
-              <p>History & pasta</p>
-              <div className="days">6 Day Plan Ready</div>
-            </div>
+
+          <div className="floating-cards" role="list" aria-label="Popular destinations">
+            {[
+              { dest: 'Paris, France', flag: '🗼', desc: 'Art, romance & cuisine', days: '7 Day Plan Ready' },
+              { dest: 'Bali, Indonesia', flag: '🌺', desc: 'Temples & beaches', days: '5 Day Plan Ready' },
+              { dest: 'Tokyo, Japan', flag: '🗻', desc: 'Culture & street food', days: '10 Day Plan Ready' },
+              { dest: 'Rome, Italy', flag: '🏛️', desc: 'History & pasta', days: '6 Day Plan Ready' },
+            ].map(({ dest, flag, desc, days }) => (
+              <div
+                key={dest}
+                className="trip-card"
+                role="listitem"
+                onClick={() => handleQuickDestination(dest)}
+                onKeyDown={e => e.key === 'Enter' && handleQuickDestination(dest)}
+                tabIndex={0}
+                aria-label={`Plan trip to ${dest}`}
+              >
+                <div className="flag" aria-hidden="true">{flag}</div>
+                <h4>{dest}</h4>
+                <p>{desc}</p>
+                <div className="days">{days}</div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
       {showForm && isAuthenticated && (
-        <TripPlannerForm 
+        <TripPlannerForm
           initialDestination={destination}
-          onTripGenerated={handleTripGenerated}
+          onTripGenerated={(data) => { setTripData(data); setShowForm(false); }}
           onClose={() => setShowForm(false)}
           user={user}
         />
       )}
 
       {tripData && (
-        <TripResult 
+        <TripResult
           tripData={tripData}
-          onClose={handleCloseResult}
+          onClose={() => { setTripData(null); setDestination(''); }}
         />
       )}
     </>

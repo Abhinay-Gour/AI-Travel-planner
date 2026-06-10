@@ -2,11 +2,16 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 
 const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
 
-if (!API_KEY) {
-  console.error('Gemini API key not found. Please add VITE_GEMINI_API_KEY to your .env file');
+// Suppress console logs in production
+const isDev = import.meta.env.DEV;
+const log = isDev ? console.log : () => {};
+const logError = isDev ? console.error : () => {};
+
+if (!API_KEY && isDev) {
+  console.warn('Gemini API key not found. Please add VITE_GEMINI_API_KEY to your .env file');
 }
 
-const genAI = new GoogleGenerativeAI(API_KEY);
+const genAI = API_KEY ? new GoogleGenerativeAI(API_KEY) : null;
 
 // Curated static Unsplash image IDs — always work, no API needed
 const DEST_IMAGES = {
@@ -39,7 +44,7 @@ const getDestImage = (destination = '', w = 800, h = 600) => {
 
 export const generateTripPlan = async (destination, startDate, endDate, days, preferences = '') => {
   try {
-    if (!API_KEY) throw new Error('API key not configured. Please check your .env file.');
+    if (!API_KEY || !genAI) throw new Error('API key not configured.');
 
     let model;
     try {
@@ -99,17 +104,17 @@ Language: [Language]
 
 Additional preferences: ${preferences || 'Standard travel experience with authentic local experiences'}`;
 
-    console.log('Generating trip plan for:', destination);
+    log('Generating trip plan for:', destination);
     const result = await model.generateContent(prompt);
     const text = result.response.text();
-    console.log('AI Response received successfully');
+    log('AI Response received successfully');
 
     const parsedData = parseTextResponseWithLocations(text, destination, startDate, endDate, days);
-    console.log('✅ Trip plan generated successfully!');
+    log('✅ Trip plan generated successfully!');
     return parsedData;
 
   } catch (error) {
-    console.error('Error generating trip plan:', error);
+    logError('Error generating trip plan:', error);
     return createEnhancedFallbackResponse(destination, startDate, endDate, days);
   }
 };
@@ -159,7 +164,7 @@ const parseTextResponseWithLocations = (text, destination, startDate, endDate, d
       rawResponse: text
     };
   } catch (parseError) {
-    console.error('Error parsing response:', parseError);
+    logError('Error parsing response:', parseError);
     return createEnhancedFallbackResponse(destination, startDate, endDate, days);
   }
 };
@@ -273,7 +278,7 @@ const getLanguageInfo = (destination) => {
 };
 
 const createEnhancedFallbackResponse = (destination, startDate, endDate, days) => {
-  console.log('Creating fallback response for:', destination);
+  log('Creating fallback response for:', destination);
   const img = getDestImage(destination, 800, 400);
   return {
     destination,
