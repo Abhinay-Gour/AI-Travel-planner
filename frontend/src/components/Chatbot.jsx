@@ -7,11 +7,15 @@ const STORAGE_KEY = 'ai_travel_chat_history';
 
 const QUICK_REPLIES = [
   '🗺️ Best places in India?',
-  '💰 Budget trip ideas',
-  '🏖️ Beach destinations',
-  '🏔️ Hill stations',
-  '✈️ Indore se Goa kaise jaaye?',
-  '🚆 Train vs Flight vs Bus comparison',
+  '💰 Budget trip under ₹10,000?',
+  '🏖️ Best beach destinations?',
+  '🏔️ Best hill stations?',
+  '🌍 Visa-free countries for Indians?',
+  '🎒 Packing tips for mountains?',
+  '🍜 Best food destinations India?',
+  '❄️ Best winter destinations?',
+  '🌸 Best honeymoon destinations?',
+  '🚆 Train vs Flight vs Bus?',
 ];
 
 const INITIAL_MSG = {
@@ -105,22 +109,50 @@ const Chatbot = () => {
           .map(m => `${m.role === 'user' ? 'User' : 'Assistant'}: ${m.text}`)
           .join('\n');
 
-        const prompt = `You are an expert AI travel assistant for an Indian travel planning website called "AI Travel Planner".
+        const prompt = `You are TravelGPT — a world-class AI travel expert for Indians, built into the AI Travel Planner website.
 
-Rules:
-- Answer in the SAME language the user writes in (Hindi mein puche to Hindi mein jawab do, English mein puche to English mein)
-- You remember the full conversation context — answer follow-up questions accordingly
-- For transport questions (flight/train/bus): always give ALL 3 options with cost in INR, duration, and pros/cons
-- For destinations: mention best time, budget breakdown, must-see places, local food, stay options
-- For international: mention visa info for Indians, flight cost from India
-- Use emojis and bullet points for clarity
-- Keep answers detailed but structured (max 8-10 lines)
-- If user asks about booking flights/hotels, mention they can use the Transport and Hotels pages on this site
+YOUR EXPERTISE:
+1. DESTINATIONS — India & worldwide: best places, hidden gems, honeymoon, solo, family, adventure, pilgrimage
+2. TRANSPORT — Flights (IndiGo, Air India, SpiceJet), Trains (IRCTC, Rajdhani, Vande Bharat), Buses (Volvo sleeper), Road trips
+3. BUDGET PLANNING — Exact INR cost breakdowns: stay, food, transport, activities for any destination
+4. HOTELS & STAY — Hostels, homestays, heritage hotels, houseboats, campsites, luxury resorts
+5. FOOD — Local dishes, best restaurants, street food at every destination
+6. VISA & DOCUMENTS — Visa requirements for Indians to every country, e-visa, visa on arrival
+7. PACKING — Season & destination specific packing lists (mountains, beach, international, pilgrimage)
+8. WEATHER — Best time to visit every destination, monsoon tips, peak vs offseason
+9. SAFETY — Travel safety, emergency numbers, insurance, solo female travel tips
+10. ITINERARY — Day-by-day plans for any destination, duration, budget
+11. ADVENTURE — Trekking, camping, scuba, paragliding, rafting, skiing locations
+12. PILGRIMAGE — Char Dham, Vaishno Devi, Tirupati, Shirdi, Golden Temple, all major religious sites
+13. HONEYMOON — Romantic destinations, best resorts, couple activities
+14. INTERNATIONAL — Southeast Asia, Europe, Middle East, USA — full guidance for Indians
+
+KEY KNOWLEDGE:
+- Budget gems: Rishikesh (8k/5d), Hampi (7k/3d), Varanasi (8k/4d), Pondicherry (10k/4d), Mcleod Ganj (9k/5d)
+- Hill stations: Manali, Shimla, Darjeeling, Ooty, Munnar, Coorg, Mussoorie, Kasol, Spiti
+- Beaches: Goa, Andaman, Varkala, Gokarna, Puri, Diu, Pondicherry
+- Adventure: Rishikesh (rafting), Manali (skiing), Leh (bikes), Andaman (scuba), Bir Billing (paragliding)
+- Honeymoon: Kashmir, Andaman, Maldives, Bali, Kerala, Udaipur
+- Visa-free for Indians: Nepal, Bhutan, Maldives, Mauritius
+- Visa on arrival: Thailand, Indonesia, Sri Lanka, Cambodia
+- Easy e-visa: Dubai, Malaysia, Vietnam, Turkey, Kenya
+
+RULES:
+- Reply in SAME language user uses (Hindi/English/Hinglish)
+- NEVER say I don't know — always give best answer
+- ONLY answer travel-related questions
+- Always give SPECIFIC real names — hotels, restaurants, places — never generic
+- For transport: show all options (flight/train/bus) with INR price
+- For budget: give per-day breakdown
+- For international: always mention visa status for Indian passport
+- Use emojis + bullet points, max 10-12 lines, concise but complete
 
 Conversation so far:
 ${history}
 
-Now answer the latest message. Give a complete, helpful response:`;
+User: ${userText}
+
+Answer:`;
 
         const result = await model.generateContent(prompt);
         botReply = result.response.text();
@@ -141,24 +173,23 @@ Now answer the latest message. Give a complete, helpful response:`;
   };
 
   const getFallbackReply = (q) => {
-    const lower = q.toLowerCase();
-    if (lower.includes('goa')) {
-      if (lower.includes('indore') || lower.includes('flight') || lower.includes('train') || lower.includes('bus') || lower.includes('kaise')) {
-        return '✈️ Indore se Goa — Teen Options:\n\n🛫 Flight: ₹3,000-8,000 (1.5 hrs, IndiGo/SpiceJet, Indore→Goa direct)\n\n🚆 Train: ₹800-2,500 (Indore→Madgaon, ~20 hrs, Avantika/Rajdhani)\n\n🚌 Bus: ₹600-1,200 (Indore→Panaji, ~18 hrs, Volvo sleeper)\n\n💡 Best value: Train (sleeper AC). Best time: Oct-March. Goa budget: ₹15,000-25,000 for 5 days.';
-      }
-      return '🏖️ Goa is perfect Oct-March! Budget: ₹15,000-25,000 for 5 days. North Goa for parties, South Goa for peace. Must-visit: Baga Beach, Dudhsagar Falls, Old Goa churches.';
-    }
-    if (lower.includes('train') || lower.includes('flight') || lower.includes('bus') || lower.includes('transport')) {
-      return '🚆 Transport Options (India):\n\n✈️ Flight: Fastest, ₹2,000-10,000, book 2-3 weeks early\n🚆 Train: Best value, ₹500-3,000, AC/Sleeper options, book on IRCTC\n🚌 Bus: Cheapest, ₹300-1,500, Volvo sleeper for overnight\n\nKaunsi jagah jaana hai? Main aapko exact options bata sakta hoon!';
-    }
-    if (lower.includes('manali') || lower.includes('himachal')) return '🏔️ Manali is best May-June & Oct-Nov. Budget: ₹20,000-35,000 for 7 days. Must-do: Rohtang Pass, Solang Valley, Old Manali market. Book hotels in advance!';
-    if (lower.includes('budget')) return '💸 Top budget destinations from India: Rishikesh (₹8k/5days), Pondicherry (₹10k/4days), Hampi (₹7k/3days), Varanasi (₹8k/4days). All include stay, food & local transport!';
-    if (lower.includes('beach')) return '🏖️ Best beaches: Goa (party vibes), Andaman (crystal water, ₹30k/5days), Varkala Kerala (cliffs & yoga), Pondicherry (French charm). Andaman is the most scenic!';
-    if (lower.includes('visa')) return '🌍 Visa-free for Indians: Nepal, Bhutan, Maldives, Mauritius, Indonesia (30 days), Thailand (visa on arrival), Sri Lanka (e-visa free). Southeast Asia is easiest for Indians!';
-    if (lower.includes('indore')) return '🏛️ Indore highlights: Rajwada Palace, 56 Dukan (poha, jalebi, garadu), Sarafa Bazaar (night food market), Lal Bagh Palace, Kanch Mandir, Patalpani Waterfall. Best food city in India!';
-    if (lower.includes('pack') || lower.includes('packing')) return '🎒 Essentials: Comfortable walking shoes, weather-appropriate clothes, power bank, travel adapter, copies of documents, basic medicines, reusable water bottle, and a good camera!';
-    if (lower.includes('hotel') || lower.includes('stay') || lower.includes('ruk')) return '🏨 Stay Options:\n\n⭐ Budget: Hostels/Guesthouses ₹500-1,500/night\n⭐⭐ Mid-range: 3-star hotels ₹1,500-4,000/night\n⭐⭐⭐ Luxury: 5-star ₹8,000+/night\n\nBooking.com, MakeMyTrip, OYO best platforms hain. Destination batao, specific recommendations dunga!';
-    return '✈️ Main aapki help kar sakta hoon! Destination, budget, aur travel dates batao — personalized trip plan bana dunga. Ya koi bhi travel question pucho!';
+    const l = q.toLowerCase();
+    if (l.includes('visa')) return '🌍 Visa Info for Indians:\n\n✅ Visa-Free: Nepal, Bhutan, Maldives, Mauritius, Jamaica\n✅ Visa on Arrival: Thailand (30d), Indonesia (30d), Cambodia, Myanmar, Laos\n✅ Easy e-Visa: Dubai, Malaysia, Vietnam, Turkey, Kenya, Sri Lanka\n📄 Schengen (Europe): Embassy apply, 2-3 weeks, bank statement needed';
+    if (l.includes('honeymoon') || l.includes('couple') || l.includes('romantic')) return '🌸 Top Honeymoon Destinations:\n\n🌊 Andaman — ₹35k/couple, 5 days, crystal beaches\n❄️ Kashmir — ₹40k/couple, 6 days, Dal Lake & snow\n💧 Kerala — ₹30k/couple, 5 days, houseboat & backwaters\n🏝️ Maldives — ₹1.2L/couple, 4 days, overwater villa\n🌴 Bali — ₹70k/couple, 6 days, temples & terraces\n🏰 Udaipur — ₹25k/couple, 4 days, Lake Palace';
+    if (l.includes('pack') || l.includes('packing')) return '🎒 Packing by Destination:\n\n🏔️ Mountains: Thermal wear, windproof jacket, trek shoes, SPF50+, lip balm, ORS\n🏖️ Beach: Light clothes, flip flops, sunscreen, swimwear, insect repellent\n🌍 International: Passport+copies, travel insurance, universal adapter, local currency\n🛕 Pilgrimage: Modest clothes, comfy footwear, identity proof';
+    if (l.includes('budget') || l.includes('cheap') || l.includes('sasta')) return '💰 Budget Trips under ₹10,000:\n\n🔵 Rishikesh — ₹8k/5d (rafting+yoga+ghats)\n🔵 Hampi — ₹7k/3d (ruins+boulders+culture)\n🔵 Mcleod Ganj — ₹9k/5d (mountains+monastery)\n🔵 Varanasi — ₹8k/4d (ghats+temple+boat)\n🔵 Pondicherry — ₹10k/4d (French quarter+beach)\nIncludes: hostel + local food + local transport';
+    if (l.includes('beach')) return '🏖️ Best Beach Destinations:\n\n🇮🇳 Andaman — Radhanagar Beach, best Oct-May, ₹25k/5d\n🌴 Goa — Baga, Palolem, Anjuna, best Nov-Feb, ₹15k/5d\n🏄 Varkala Kerala — cliff beach, yoga, best Oct-Mar, ₹12k/4d\n🌊 Gokarna — peaceful, hippie vibes, ₹8k/4d\n🌅 Pondicherry — French charm+beach, ₹10k/4d';
+    if (l.includes('hill') || l.includes('mountain') || l.includes('snow')) return '🏔️ Best Hill Stations:\n\n❄️ Manali — Rohtang Pass, best May-Jun & Dec-Jan, ₹20k/6d\n🌿 Shimla — Mall Road, colonial charm, best Mar-Jun, ₹15k/5d\n🌟 Darjeeling — tea gardens, toy train, best Mar-May, ₹18k/5d\n🌸 Ooty — Nilgiri hills, botanical garden, best Apr-Jun, ₹12k/4d\n🗻 Spiti — offbeat monasteries, best Jun-Sep, ₹25k/7d\n✨ Kasol — backpacker paradise, best Mar-Jun, ₹9k/5d';
+    if (l.includes('winter') || l.includes('december') || l.includes('january')) return '❄️ Best Winter Destinations (Dec-Feb):\n\n🏰 Rajasthan — Jaipur, Jodhpur, Udaipur, perfect weather, ₹18k/6d\n🌴 Goa — peak season, parties & beaches, ₹18k/5d\n🌿 Kerala — backwaters, Munnar, Kovalam, ₹20k/6d\n🐊 Andaman — best diving time, ₹28k/5d\n❄️ Manali/Kashmir — snowfall & skiing, ₹25k/6d';
+    if (l.includes('goa')) return '🏖️ Goa Guide:\n\n📍 Beaches: Baga, Calangute, Anjuna, Palolem, Vagator\n🏨 Stay: The Leela, Aloft North Goa, Hotel Baga Marina\n🍽️ Food: Fishermans Wharf, Brittos Beach Shack, Martins Corner\n🛕 Visit: Dudhsagar Falls, Old Goa Churches, Chapora Fort\n⏰ Best Time: Nov-Feb | 💰 Budget: ₹15k-25k/5d\n🚆 From Indore: Flight ₹3-7k | Train ₹800-2.5k | Bus ₹600-1.2k';
+    if (l.includes('kashmir') || l.includes('srinagar')) return '❄️ Kashmir Guide:\n\n📍 Places: Dal Lake, Gulmarg, Pahalgam, Sonamarg, Betaab Valley\n🏨 Stay: The Lalit Grand Palace, Houseboat on Dal Lake, Vivanta Dal View\n🍽️ Food: Ahdoos Restaurant — Rogan Josh, Wazwan, Kashmiri Kahwa\n⏰ Best Time: Apr-Jun (flowers) | Dec-Jan (snow)\n💰 Budget: ₹22k-35k/6d | 🛍️ Buy: Pashmina, Saffron, Dry Fruits';
+    if (l.includes('manali')) return '🏔️ Manali Guide:\n\n📍 Places: Rohtang Pass, Solang Valley, Hadimba Temple, Old Manali, Beas River\n🏨 Stay: Span Resort & Spa, The Himalayan, Apple Country Resort\n🍽️ Food: Johnsons Cafe, Cafe 1947, Chopsticks Restaurant\n⏰ Best Time: May-Jun (adventure) | Dec-Jan (snow)\n💰 Budget: ₹18k-30k/6d | 🎿 Activities: Skiing, Paragliding, Rafting';
+    if (l.includes('leh') || l.includes('ladakh')) return '🏔️ Leh-Ladakh Guide:\n\n📍 Places: Pangong Tso, Nubra Valley, Khardung La, Thiksey Monastery, Magnetic Hill\n🏨 Stay: The Grand Dragon Ladakh, Nimmu House, Stok Palace\n🍽️ Food: Tibetan Kitchen — Thukpa, Momos, Butter Tea\n⏰ Best Time: June-September only\n💰 Budget: ₹30k-50k/7d\n⚠️ Tip: Acclimatize 2 days, carry altitude medicine';
+    if (l.includes('train') || l.includes('flight') || l.includes('bus') || l.includes('transport')) return '🚆 Transport Options:\n\n✈️ Flight: Fastest, ₹2k-10k, book 2-3 weeks early on MakeMyTrip/Ixigo\n🚆 Train: Best value, ₹500-3k, book on IRCTC 60 days early\n🚌 Bus: Cheapest, ₹300-1.5k, Volvo sleeper for overnight\n🚗 Cab: Best for hills/remote, ₹2k-8k/day\n\nKaunsi city se kaunsi city? Exact options bata dunga!';
+    if (l.includes('pilgrimage') || l.includes('temple') || l.includes('mandir') || l.includes('tirth')) return '🛕 Top Pilgrimage Destinations:\n\n🙏 Varanasi — Kashi Vishwanath, Ganga Aarti\n🙏 Tirupati — Balaji Temple, darshan booking mandatory\n🙏 Vaishno Devi — Katra, 14km trek\n🙏 Shirdi — Sai Baba, 6hr from Mumbai\n🙏 Golden Temple — Amritsar, free langar 24/7\n🙏 Char Dham — Badrinath, Kedarnath, Gangotri, Yamunotri (May-Oct)';
+    if (l.includes('international') || l.includes('abroad') || l.includes('foreign')) return '🌍 Best International Trips for Indians:\n\n🇮🇩 Bali — Visa on arrival, ₹60-80k/couple, 6d\n🇹🇭 Thailand — Visa on arrival, ₹60-90k/couple, 7d\n🇸🇬 Singapore — e-Visa, ₹1L+/couple, 5d\n🇦🇪 Dubai — e-Visa ₹3k, ₹1.2L+/couple, 5d\n🇲🇻 Maldives — Visa free, ₹1.5L+/couple, 4d\n🇯🇵 Japan — Visa required, ₹1.5L/person, 7d';
+    if (l.includes('food') || l.includes('khana') || l.includes('eat')) return '🍜 Best Food Destinations India:\n\n🥘 Indore — Sarafa Bazaar, 56 Dukan, poha-jalebi, garadu\n🍖 Lucknow — Tunday Kababi, Idris Biryani, basket chaat\n🍛 Hyderabad — Paradise Biryani, Shah Ghouse Haleem\n🦀 Mumbai — Trishna (seafood), Khyber, Vada Pav\n🥗 Delhi — Karims, Paranthe Wali Gali, Chole Bhature\n🍮 Kolkata — Kathi Roll, Mishti Doi, Rosogolla';
+    return '✈️ Main aapka travel expert hoon! Poochho kuch bhi:\n\n📍 Destination suggestions\n💰 Budget planning\n🚆 Transport options\n🏨 Hotel recommendations\n🍜 Local food guide\n🌍 Visa information\n🎒 Packing lists\n\nDestination batao — poora plan bata dunga!';
   };
 
   const handleKey = (e) => {
