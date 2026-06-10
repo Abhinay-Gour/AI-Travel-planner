@@ -394,9 +394,66 @@ const destinationsData = {
 };
 
 export const getDestinationData = (destination) => {
-  const d = destination.toLowerCase();
+  const d = destination.toLowerCase().trim();
+  // 1. Direct key match
+  if (destinationsData[d]) return { key: d, ...destinationsData[d] };
+  // 2. Destination contains key OR key contains destination
   for (const [key, data] of Object.entries(destinationsData)) {
     if (d.includes(key) || key.includes(d)) return { key, ...data };
+  }
+  // 3. Word-level partial match (e.g. "srinagar" matches "kashmir", "new york" matches "newyork")
+  const words = d.replace(/[^a-z\s]/g, '').split(/\s+/);
+  const ALIASES = {
+    srinagar: 'kashmir', 'jammu kashmir': 'kashmir', 'j&k': 'kashmir',
+    'new york city': 'new york', nyc: 'new york', 'new york': 'new york',
+    'kuala lumpur': 'kualalumpur', kl: 'kualalumpur',
+    ladakh: 'leh', 'leh ladakh': 'leh',
+    calcutta: 'kolkata', 'west bengal': 'kolkata',
+    bombay: 'mumbai', 'new delhi': 'delhi',
+    'hong kong': 'beijing', osaka: 'kyoto', nara: 'kyoto',
+    trivandrum: 'kerala', kochi: 'kerala', munnar: 'kerala', alleppey: 'kerala',
+    alappuzha: 'kerala', thekkady: 'kerala',
+    kodaikanal: 'ooty', 'nilgiri': 'ooty',
+    pushkar: 'jaipur', ajmer: 'jaipur',
+    mathura: 'agra', vrindavan: 'agra',
+    pondicherry: 'goa', puducherry: 'goa',
+    'port blair': 'andaman', havelock: 'andaman', 'neil island': 'andaman',
+    mussoorie: 'shimla', nainital: 'shimla', dehradun: 'rishikesh',
+    haridwar: 'rishikesh', kasol: 'manali', spiti: 'manali', kullu: 'manali',
+    dharamsala: 'manali', 'mcleod ganj': 'manali',
+    thekkady: 'kerala', varkala: 'kerala', kovalam: 'kerala',
+    karnataka: 'mysore', bangalore: 'mysore', bengaluru: 'mysore',
+    nashik: 'pune', lonavala: 'pune', mahabaleshwar: 'pune',
+    bikaner: 'jodhpur', jaisalmer: 'jodhpur', 'blue city': 'jodhpur',
+    aurangabad: 'hyderabad', warangal: 'hyderabad',
+    pattaya: 'bangkok', 'chiang mai': 'bangkok', 'chiang rai': 'bangkok',
+    krabi: 'phuket', 'koh samui': 'phuket', 'phi phi': 'phuket',
+    lombok: 'bali', 'nusa penida': 'bali', ubud: 'bali', seminyak: 'bali',
+    sentosa: 'singapore', 'marina bay': 'singapore',
+    'abu dhabi': 'dubai', sharjah: 'dubai', 'ras al khaimah': 'dubai',
+    cappadocia: 'istanbul', antalya: 'istanbul', ankara: 'istanbul',
+    florence: 'rome', milan: 'milan', venice: 'rome', naples: 'rome',
+    edinburgh: 'london', manchester: 'london', liverpool: 'london',
+    marseille: 'paris', nice: 'paris', lyon: 'paris',
+    madrid: 'barcelona', seville: 'barcelona',
+    amsterdam: 'amsterdam', rotterdam: 'amsterdam',
+    melbourne: 'sydney', brisbane: 'sydney',
+    luxor: 'cairo', aswan: 'cairo', sharm: 'cairo',
+    busan: 'seoul', jeju: 'seoul',
+    shanghai: 'beijing', 'hong kong': 'beijing', guangzhou: 'beijing',
+  };
+  const aliasKey = ALIASES[d];
+  if (aliasKey && destinationsData[aliasKey]) return { key: aliasKey, ...destinationsData[aliasKey] };
+  for (const word of words) {
+    if (word.length > 3 && ALIASES[word] && destinationsData[ALIASES[word]]) {
+      return { key: ALIASES[word], ...destinationsData[ALIASES[word]] };
+    }
+    if (word.length > 3 && destinationsData[word]) {
+      return { key: word, ...destinationsData[word] };
+    }
+    for (const [key, data] of Object.entries(destinationsData)) {
+      if (key.includes(word) && word.length > 3) return { key, ...data };
+    }
   }
   return null;
 };
